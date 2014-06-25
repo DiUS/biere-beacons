@@ -11,6 +11,7 @@
 @implementation BadgeCell
 
 double kCellSize = 144.0;
+
 NSString const *kBadgeCellID = @"BadgeCell";
 
 - (id)initWithFrame:(CGRect)frame

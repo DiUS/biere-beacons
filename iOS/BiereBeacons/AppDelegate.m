@@ -9,10 +9,10 @@
 #import "AppDelegate.h"
 #import "BadgeViewController.h"
 #import "IngredientBadge.h"
+#import "RegionDefaults.h"
+#import "IneligibleDeviceViewController.h"
 
 @interface AppDelegate()
-
-@property (nonatomic) NSArray *badges;
 
 @end
 
@@ -25,11 +25,18 @@
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     
-    BadgeViewController *rootVC = [[BadgeViewController alloc]
-                                   initWithBadges:self.badges];
+    NSArray *badges = [IngredientBadge badges];    
+    UIViewController *rootVC = [[BadgeViewController alloc]
+                                initWithBadges:badges];
+    
+    if (![RegionDefaults isBeaconReady])
+    {
+        rootVC = [[IneligibleDeviceViewController alloc] init];
+    }
     
     UINavigationController *navCtrl = [[UINavigationController alloc]
                                        initWithRootViewController:rootVC];
+    
     navCtrl.navigationBarHidden = YES;
     self.window.rootViewController = navCtrl;
     
@@ -61,24 +68,6 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-}
-
-
-#pragma mark - Private
-
-- (NSArray *)badges
-{
-    if (!_badges)
-    {
-        IngredientBadge *hops = [[IngredientBadge alloc] initWithName:@"Hops"];
-        IngredientBadge *water = [[IngredientBadge alloc] initWithName:@"Water"];
-        IngredientBadge *yeast = [[IngredientBadge alloc] initWithName:@"Yeast"];
-        IngredientBadge *barley = [[IngredientBadge alloc] initWithName:@"barley"];
-        
-        _badges = @[hops, water, yeast, barley];
-    }
-        
-    return _badges;
 }
 
 @end

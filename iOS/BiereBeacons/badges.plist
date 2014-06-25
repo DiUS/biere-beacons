@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>uuid</key>
+		<string>b9407f30-f5f8-466e-aff9-25556b57fe6d</string>
+		<key>major</key>
+		<integer>1</integer>
+		<key>minor</key>
+		<integer>2</integer>
+		<key>name</key>
+		<string>Barley</string>
+		<key>imageURL</key>
+		<string>barley</string>
+		<key>isFound</key>
+		<false/>
+	</dict>
+	<dict>
+		<key>uuid</key>
+		<string>b9407f30-f5f8-466e-aff9-25556b57fe6d</string>
+		<key>major</key>
+		<integer>15295</integer>
+		<key>minor</key>
+		<integer>49236</integer>
+		<key>name</key>
+		<string>Yeast</string>
+		<key>imageURL</key>
+		<string>yeast</string>
+		<key>isFound</key>
+		<false/>
+	</dict>
+	<dict>
+		<key>uuid</key>
+		<string>b9407f30-f5f8-466e-aff9-25556b57fe6d</string>
+		<key>major</key>
+		<integer>23491</integer>
+		<key>minor</key>
+		<integer>36886</integer>
+		<key>name</key>
+		<string>Water</string>
+		<key>imageURL</key>
+		<string>water</string>
+		<key>isFound</key>
+		<false/>
+	</dict>
+	<dict>
+		<key>uuid</key>
+		<string>b9407f30-f5f8-466e-aff9-25556b57fe6d</string>
+		<key>major</key>
+		<integer>50730</integer>
+		<key>minor</key>
+		<integer>33558</integer>
+		<key>name</key>
+		<string>Hops</string>
+		<key>imageURL</key>
+		<string>hops</string>
+		<key>isFound</key>
+		<false/>
+	</dict>
+</array>
+</plist>
