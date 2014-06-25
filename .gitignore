@@ -1,3 +1,7 @@
 .DS_Store
 Android/.metadata/
 Android/BiereBeacons/bin/
+iOS/BiereBeacons.xcodeproj/project.xcworkspace/xcshareddata/
+iOS/BiereBeacons.xcodeproj/project.xcworkspace/xcuserdata/brentoncrowley.xcuserdatad/WorkspaceSettings.xcsettings
+iOS/BiereBeacons.xcworkspace/
+iOS/Pods/
