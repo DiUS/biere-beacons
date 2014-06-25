@@ -1,0 +1,4 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+	<color android:layout_height="wrap_content" android:id="@+id/color1" android:layout_width="wrap_content" name="game_success_bg_colour">#79B41C</color>
+	<color android:layout_height="wrap_content" android:id="@+id/color2" android:layout_width="wrap_content" name="game_denied_bg_colour">#B5393E</color>
+</resources>
