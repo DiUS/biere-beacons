@@ -12,13 +12,26 @@
 
 @protocol IngredientBadgeDelegate <NSObject>
 
-- (void)ingredientBadgeDidStartLogging:(IngredientBadge *)badge;
+- (void)ingredientBadgeDidSpotBadge:(IngredientBadge *)badge;
+- (void)ingredientBadgeDidStartGathering:(IngredientBadge *)badge;
 - (void)ingredientBadge:(IngredientBadge *)badge
       didUpdateLogCount:(int)logCount;
 - (void)ingredientBadgeDidFindBadge:(IngredientBadge *)badge;
 - (void)ingredientBadgeDidTimeout:(IngredientBadge *)badge;
 
 @end
+
+typedef enum {
+	
+	FindStatusUnknown,
+    FindStatusSpotted,
+    FindStatusGathering,
+    FindStatusFound
+    
+} BadgeFindStatus;
+
+extern const int kNumSuccessiveLogs;
+extern const int kGatherStartDelay;
 
 @interface IngredientBadge : NSObject
 
@@ -36,6 +49,6 @@
 + (void)writeBadges;
 
 - (id)initWithName:(NSString *)name;
-- (void)updateCaptureCount;
+- (void)updateLogCount;
 
 @end

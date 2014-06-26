@@ -11,16 +11,17 @@
 #import "BadgeCell.h"
 #import "RegionDefaults.h"
 #import <CoreLocation/CoreLocation.h>
-#import <MBProgressHUD.h>
 #import "CaptureManager.h"
+#import <MBProgressHUD.h>
 
 @interface BadgeViewController () <CLLocationManagerDelegate,
-IngredientBadgeDelegate>
+IngredientBadgeDelegate, UIActionSheetDelegate, MBProgressHUDDelegate>
 
 @property (nonatomic) NSArray *badges;
 @property (nonatomic) CLLocationManager *locationManager;
 @property (nonatomic) RegionDefaults *regionDefaults;
 @property (nonatomic) CaptureManager *captureManager;
+@property (nonatomic) IngredientBadge *focussedBadge;
 @property (nonatomic) MBProgressHUD *hud;
 
 @end
@@ -82,6 +83,7 @@ static float kInset = 8.0f;
                     name:UIApplicationDidBecomeActiveNotification
                   object:nil];
     
+    DLog(@"Found Badges: %@", [self foundBadges]);
 }
 
 #pragma mark - Public
@@ -113,6 +115,18 @@ static float kInset = 8.0f;
          stopRangingBeaconsInRegion:(CLBeaconRegion *)region];
 }
 
+- (void)refreshBadges
+{
+    [IngredientBadge writeBadges];
+    [self.collectionView reloadData];
+}
+
+- (NSArray *)foundBadges
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"isFound = YES"];
+    return [self.badges filteredArrayUsingPredicate:predicate];
+}
+
 #pragma mark Notification Callbacks
 
 - (void)didReceiveNotification:(NSNotification *)notification
@@ -122,15 +136,14 @@ static float kInset = 8.0f;
     {
         // handle enter background notification
         DLog(@"Entered Background");
-//        [self stopRangingBeaconRegion:[self.regionDefaults beaconRegion]];
+        [self stopRangingBeaconRegion:[self.regionDefaults beaconRegion]];
     }
     else if ([notification.name
               isEqualToString:UIApplicationDidBecomeActiveNotification])
     {
         // enter foreground
         DLog(@"Entered Foreground");
-        [self.locationManager
-         requestStateForRegion:[self.regionDefaults beaconRegion]];
+        [self startRangingBeaconRegion:[self.regionDefaults beaconRegion]];
     }
 }
 
@@ -144,7 +157,7 @@ static float kInset = 8.0f;
 - (NSInteger)collectionView:(UICollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section
 {
-    return self.badges.count;
+    return [self foundBadges].count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
@@ -164,7 +177,7 @@ static float kInset = 8.0f;
         
     }
     
-    IngredientBadge *badge = self.badges[indexPath.row];
+    IngredientBadge *badge = [self foundBadges][indexPath.row];
     
     NSString *imageName = nil;
     
@@ -179,6 +192,37 @@ static float kInset = 8.0f;
 }
 
 #pragma mark - UICollectionViewDelegate
+
+- (void)collectionView:(UICollectionView *)collectionView
+didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    UIActionSheet *actionSheet = [
+                                  [UIActionSheet alloc]
+                                  initWithTitle:nil
+                                  delegate:self
+                                  cancelButtonTitle:@"Cancel"
+                                  destructiveButtonTitle:@"Reset"
+                                  otherButtonTitles: nil];
+
+    [actionSheet showInView:self.navigationController.view];
+    
+    self.focussedBadge = [self foundBadges][indexPath.row];
+}
+
+#pragma mark - UIActionSheetDelegate
+
+- (void)actionSheet:(UIActionSheet *)actionSheet
+clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    
+    if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Reset"])
+    {
+        self.focussedBadge.isFound = NO;
+        [self refreshBadges];
+    }
+    
+    self.focussedBadge = nil;
+}
 
 #pragma mark - CLLocationManagerDelegate
 
@@ -234,7 +278,11 @@ didStartMonitoringForRegion:(CLRegion *)region
         didRangeBeacons:(NSArray *)beacons
                inRegion:(CLBeaconRegion *)region
 {
-    [self.captureManager logRangedBeacons:beacons];
+    if (beacons.count)
+    {
+        [self.captureManager logRangedBeacons:beacons];
+        DLog(@"did range beacons. %ld", beacons.count);
+    }
 }
 
 - (void)locationManager:(CLLocationManager *)manager
@@ -246,26 +294,143 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
 
 #pragma mark - IngredientViewDelegate
 
-- (void)ingredientBadgeDidStartLogging:(IngredientBadge *)badge
+- (void)ingredientBadgeDidSpotBadge:(IngredientBadge *)badge
 {
-    DLog(@"Did start logging");
+    DLog(@"Did Spot Badge");
+    [self hideCurrentHUD];
+    
+    self.hud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
+	[self.navigationController.view addSubview:self.hud];
+    
+    // Recommended icon size for progress hud.
+    UIImageView *customView = [[UIImageView alloc]
+                               initWithFrame:CGRectMake(0.0,
+                                                        0.0,
+                                                        100.0,
+                                                        100.0)
+                               ];
+    customView.contentMode = UIViewContentModeScaleAspectFit;
+    customView.image = [UIImage imageNamed:kLockedBadgedImageName];
+    
+    self.hud.customView = customView;
+    
+	// Set custom view mode
+	self.hud.mode = MBProgressHUDModeCustomView;
+    
+	self.hud.delegate = self;
+	self.hud.labelText = @"Ingredient Spotted!";
+    
+	[self.hud show:YES];
+	[self.hud hide:YES afterDelay:kGatherStartDelay];
+}
+
+- (void)ingredientBadgeDidStartGathering:(IngredientBadge *)badge
+{
+    DLog(@"Did start gathering");
+    [self hideCurrentHUD];
 }
 
 - (void)ingredientBadge:(IngredientBadge *)badge
       didUpdateLogCount:(int)logCount
 {
     DLog(@"Did update log progress: %d", logCount);
+    if (!self.hud)
+    {
+        self.hud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
+        [self.navigationController.view addSubview:self.hud];
+        
+        // Set determinate mode
+        self.hud.mode = MBProgressHUDModeDeterminate;
+        
+        self.hud.delegate = self;
+        self.hud.labelText = @"Gathering ingredient";
+        
+        // myProgressTask uses the HUD instance to update progress
+        [self.hud show:YES];
+    }
+    
+    if (self.hud.mode == MBProgressHUDModeDeterminate)
+        self.hud.progress = (logCount / (double)kNumSuccessiveLogs);
+    
+    CABasicAnimation *animation = [CABasicAnimation animation];
+    animation.fromValue = @(self.hud.progress);
+    animation.toValue = @(logCount / (double)kNumSuccessiveLogs);
+    animation.duration = 0.3;
 }
 
 - (void)ingredientBadgeDidFindBadge:(IngredientBadge *)badge
 {
-    DLog(@"Did find badge");
-    [self.collectionView reloadData];
+    DLog(@"Did find ingredient");
+    
+    [self hideCurrentHUD];
+    
+    self.hud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
+	[self.navigationController.view addSubview:self.hud];
+    
+    // Recommended icon size for progress hud.
+    UIImageView *customView = [[UIImageView alloc]
+                               initWithFrame:CGRectMake(0.0,
+                                                        0.0,
+                                                        100.0,
+                                                        100.0)
+                               ];
+    customView.contentMode = UIViewContentModeScaleAspectFit;
+    customView.image = [UIImage imageNamed:badge.imageURL];
+    
+    self.hud.customView = customView;
+    
+	// Set custom view mode
+	self.hud.mode = MBProgressHUDModeCustomView;
+    
+	self.hud.delegate = self;
+	self.hud.labelText = [NSString stringWithFormat:@"Found %@", badge.name];
+    
+	[self.hud show:YES];
+	[self.hud hide:YES afterDelay:3];
+    [self refreshBadges];
 }
 
 - (void)ingredientBadgeDidTimeout:(IngredientBadge *)badge
 {
     DLog(@"Did timeout badge find");
+    
+    [self hideCurrentHUD];
+    
+    self.hud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
+	[self.navigationController.view addSubview:self.hud];
+    
+    self.hud.mode = MBProgressHUDModeText;
+    
+	self.hud.labelText = @"Lost ingredient!";
+	self.hud.detailsLabelText = @"Keep looking";
+    
+    [self.hud show:YES];
+    [self.hud hide:YES afterDelay:3.0];
+}
+
+#pragma mark - MBProgressHudDelegate
+
+- (void)hudWasHidden:(MBProgressHUD *)hud
+{
+	[self.hud removeFromSuperview];
+	self.hud = nil;
+}
+
+- (void)onLogUpdate:(NSNumber *)logCount
+{
+    float progress = (logCount.floatValue / kNumSuccessiveLogs);
+    self.hud.progress = progress;
+    usleep(50000);
+}
+
+- (void)hideCurrentHUD
+{
+    if (self.hud)
+    {
+        [self.hud hide:NO];
+        [self.hud removeFromSuperview];
+        self.hud = nil;
+    }
 }
 
 @end

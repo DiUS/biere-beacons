@@ -13,7 +13,9 @@
 @property (nonatomic) NSFileManager *fileManager;
 @property (nonatomic) NSArray *badges;
 @property (nonatomic) NSTimer *logTimout;
+@property (nonatomic) int gatherStartCount;
 @property (nonatomic) int logCount;
+@property (nonatomic) BadgeFindStatus findStatus;
 
 @end
 
@@ -28,6 +30,10 @@ NSString * const kIsFoundKey = @"isFound";
 NSString * const kNameKey = @"name";
 NSString * const kImageURLKey = @"imageURL";
 int const kNumSuccessiveLogs = 10;
+int const kGatherStartDelay = 3;
+int const kGatherTimeoutDuration = 1.0;
+
+#pragma mark - Public API
 
 + (id)sharedInstance
 {
@@ -44,36 +50,84 @@ int const kNumSuccessiveLogs = 10;
     return [[IngredientBadge sharedInstance] badges];
 }
 
-- (NSFileManager *)fileManager
++ (void)writeBadges
 {
-    if (!_fileManager)
-        _fileManager = [[NSFileManager alloc] init];
+    IngredientBadge *instance = [IngredientBadge sharedInstance];
     
-    return _fileManager;
+    [[IngredientBadge sharedInstance] writeBadges:[instance badges]];
 }
 
-- (NSString *)documentPath
+- (id)initWithName:(NSString *)name
 {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains
-    (NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *document = nil;
-    
-    if ([paths count] > 0)
+    if ((self = [super init]))
     {
-        
-        document = [[paths objectAtIndex:0]
-                          stringByAppendingPathComponent:
-                          [NSString stringWithFormat:@"%@%@",
-                           kDocumentName,
-                           kDocumentExtension]
-                              ];
+        _name = name;
     }
-    else
-        NSLog(@"Could not find the Documents folder.");
     
-    return document;
+    return self;
 }
 
+- (void)updateLogCount
+{
+    [self stopGatherTimeout];
+    [self startGatherTimeout];
+    // always start timeout timer
+    // timeout then reset to unknown
+    
+    switch (self.findStatus)
+    {
+        case FindStatusUnknown:
+            // update to spotted
+            self.findStatus = FindStatusSpotted;
+            // gatherStartCount = 0
+            self.gatherStartCount = 0;
+            [self.delegate ingredientBadgeDidSpotBadge:self];
+            
+            break;
+        case FindStatusSpotted:
+            // increment gatherStartCount
+            self.gatherStartCount += 1;
+            // if gatherStartCount == delay, start gathering
+            if (self.gatherStartCount == kGatherStartDelay)
+            {
+                self.findStatus = FindStatusGathering;
+                self.logCount = 0;
+                [self.delegate ingredientBadgeDidStartGathering:self];
+            }
+            
+            break;
+            
+        case FindStatusGathering:
+            
+            // increment logCount
+            self.logCount += 1;
+            [self.delegate ingredientBadge:self
+                         didUpdateLogCount:self.logCount];
+            // if log count == kNumSuccessiveLogs, then set to found
+            if (self.logCount == kNumSuccessiveLogs)
+            {
+                self.findStatus = FindStatusFound;
+                
+                self.isFound = YES;
+                // TODO: delegate callback for success
+                [self.delegate ingredientBadgeDidFindBadge:self];
+                // TODO: write badges
+                [self stopGatherTimeout];
+                [IngredientBadge writeBadges];
+            }
+            
+            break;
+            
+        case FindStatusFound:
+        default:
+            break;
+    }
+    
+    DLog(@"Update Log Count - State: %d", self.findStatus);
+}
+
+
+#pragma mark - Private
 
 - (NSArray *)badges
 {
@@ -115,6 +169,55 @@ int const kNumSuccessiveLogs = 10;
     return _badges;
 }
 
+- (NSString *)imageURL
+{
+    if (!_imageURL)
+    {
+        _imageURL = self.name;
+    }
+    
+    return _imageURL;
+}
+
+- (void)setIsFound:(BOOL)isFound
+{
+    _isFound = isFound;
+    
+    self.findStatus = _isFound ? FindStatusFound : FindStatusUnknown;
+}
+
+#pragma mark - File Handling
+
+- (NSFileManager *)fileManager
+{
+    if (!_fileManager)
+        _fileManager = [[NSFileManager alloc] init];
+    
+    return _fileManager;
+}
+
+- (NSString *)documentPath
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains
+    (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *document = nil;
+    
+    if ([paths count] > 0)
+    {
+        
+        document = [[paths objectAtIndex:0]
+                    stringByAppendingPathComponent:
+                    [NSString stringWithFormat:@"%@%@",
+                     kDocumentName,
+                     kDocumentExtension]
+                    ];
+    }
+    else
+        NSLog(@"Could not find the Documents folder.");
+    
+    return document;
+}
+
 - (IngredientBadge *)badgeForDictionary:(NSDictionary *)dictionary
 {
     IngredientBadge *badge = [[IngredientBadge alloc]
@@ -124,6 +227,8 @@ int const kNumSuccessiveLogs = 10;
     badge.major = ((NSNumber *)dictionary[kMajorKey]).integerValue;
     badge.minor = ((NSNumber *)dictionary[kMinorKey]).integerValue;
     badge.isFound = ((NSNumber *)dictionary[kIsFoundKey]).boolValue;
+    
+    badge.findStatus = badge.isFound ? FindStatusFound : FindStatusUnknown;
     
     return badge;
 }
@@ -139,13 +244,6 @@ int const kNumSuccessiveLogs = 10;
                            };
     
     return dict;
-}
-
-+ (void)writeBadges
-{
-    IngredientBadge *instance = [IngredientBadge sharedInstance];
-
-    [[IngredientBadge sharedInstance] writeBadges:[instance badges]];
 }
 
 - (void)writeBadges:(NSArray *)badges
@@ -170,82 +268,38 @@ int const kNumSuccessiveLogs = 10;
     }
 }
 
-- (id)initWithName:(NSString *)name
+#pragma mark Timer
+
+- (void)startGatherTimeout
 {
-    if ((self = [super init]))
-    {
-        _name = name;
-    }
+    [self stopGatherTimeout];
     
-    return self;
+    self.logTimout = [NSTimer
+                      scheduledTimerWithTimeInterval:kGatherTimeoutDuration
+                      target:self
+                      selector:@selector(onLogTimedOut:)
+                      userInfo:nil
+                      repeats:NO
+                      ];
 }
 
-- (NSString *)imageURL
-{
-    if (!_imageURL)
-    {
-        _imageURL = self.name;
-    }
-    
-    return _imageURL;
-}
-
-
-- (void)updateCaptureCount
-{
-    
-    [self stopTimeoutTimer];
-
-    switch (self.logCount)
-    {
-        case kNumSuccessiveLogs:
-            self.isFound = YES;
-            // TODO: delegate callback for success
-            [self.delegate ingredientBadgeDidFindBadge:self];
-            // TODO: write badges
-            [self stopTimeoutTimer];
-            [IngredientBadge writeBadges];
-            break;
-        case 0:
-            // TODO: notify delegate did start.
-            [self.delegate ingredientBadgeDidStartLogging:self];
-       
-        default:
-            self.logCount += 1;
-            // TODO: notify delegate update
-            [self.delegate ingredientBadge:self
-                         didUpdateLogCount:self.logCount];
-            
-            // Every time there is an update restart the timeout.
-            self.logTimout = [NSTimer
-                              scheduledTimerWithTimeInterval:3.0
-                              target:self
-                              selector:@selector(onLogTimedOut:)
-                              userInfo:nil
-                              repeats:NO
-                              ];
-            
-            break;
-    }
-    
-}
-
-- (void)onLogTimedOut:(NSTimer *)timer
-{
-    [self stopTimeoutTimer];
-    
-    // TODO: tell delegate that timed out
-    [self.delegate ingredientBadgeDidTimeout:self];
-    self.logCount = 0;
-}
-
-- (void)stopTimeoutTimer
+- (void)stopGatherTimeout
 {
     if (self.logTimout)
     {
         [self.logTimout invalidate];
         self.logTimout = nil;
     }
+}
+
+- (void)onLogTimedOut:(NSTimer *)timer
+{
+    [self stopGatherTimeout];
+    
+    self.logCount = 0;
+    self.gatherStartCount = 0;
+    [self.delegate ingredientBadgeDidTimeout:self];
+    
 }
 
 @end

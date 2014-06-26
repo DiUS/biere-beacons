@@ -51,7 +51,7 @@
         IngredientBadge *badge = [self badgeForBeacon:closestBeacon];
         
         if (!badge.isFound)
-            [badge updateCaptureCount];
+            [badge updateLogCount];
     }
 }
 
