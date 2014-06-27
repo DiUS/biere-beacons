@@ -11,6 +11,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import "RegionDefaults.h"
 #import <MBProgressHUD.h>
+#import "CLBeacon+Proximity.h"
 
 @interface CaptureManager()
 
@@ -32,7 +33,9 @@
         {
             NSString *key = [self keyForUUID:badge.uuid
                                        major:badge.major
-                                       minor:badge.minor];
+                                       minor:badge.minor
+                             ];
+
             dict[key] = badge;
         }
         
@@ -50,8 +53,10 @@
     {
         IngredientBadge *badge = [self badgeForBeacon:closestBeacon];
         
-        if (!badge.isFound)
+        if (!badge.isFound && [closestBeacon isBeaconImmediate])
+        {
             [badge updateLogCount];
+        }
     }
 }
 

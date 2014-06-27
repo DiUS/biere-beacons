@@ -11,6 +11,8 @@
 @interface BadgeViewController : UICollectionViewController <
 UICollectionViewDataSource, UICollectionViewDelegate>
 
+extern NSString *kBoundaryNotificationBody;
+
 - (id)initWithBadges:(NSArray *)badges;
 
 @end

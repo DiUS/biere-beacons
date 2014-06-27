@@ -10,7 +10,8 @@
 
 @implementation BadgeCell
 
-double kCellSize = 144.0;
+double kCellHeight = 166.0;
+double kCellWidth = 146.0;
 
 NSString const *kBadgeCellID = @"BadgeCell";
 
@@ -27,7 +28,7 @@ NSString const *kBadgeCellID = @"BadgeCell";
 {
     if (!_badgeView)
     {
-        CGRect frame = CGRectMake(0.0, 0.0, kCellSize, kCellSize);
+        CGRect frame = CGRectMake(0.0, 0.0, kCellWidth, kCellHeight);
         _badgeView = [[UIImageView alloc] initWithFrame:frame];
         
         [self addSubview:_badgeView];

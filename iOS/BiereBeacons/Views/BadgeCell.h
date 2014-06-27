@@ -10,7 +10,8 @@
 
 @interface BadgeCell : UICollectionViewCell
 
-extern double kCellSize;
+extern double kCellWidth;
+extern double kCellHeight;
 extern NSString *kBadgeCellID;
 
 @property (nonatomic) UIImageView *badgeView;

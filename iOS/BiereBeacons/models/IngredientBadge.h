@@ -50,5 +50,7 @@ extern const int kGatherStartDelay;
 
 - (id)initWithName:(NSString *)name;
 - (void)updateLogCount;
+- (void)logBadgeAsFound;
+- (BadgeFindStatus)badgeFindStatus;
 
 @end

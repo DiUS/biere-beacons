@@ -31,7 +31,7 @@ NSString * const kNameKey = @"name";
 NSString * const kImageURLKey = @"imageURL";
 int const kNumSuccessiveLogs = 10;
 int const kGatherStartDelay = 3;
-int const kGatherTimeoutDuration = 1.0;
+int const kGatherTimeoutDuration = 2.0;
 
 #pragma mark - Public API
 
@@ -67,12 +67,15 @@ int const kGatherTimeoutDuration = 1.0;
     return self;
 }
 
+- (BadgeFindStatus)badgeFindStatus
+{
+    return self.findStatus;
+}
+
 - (void)updateLogCount
 {
     [self stopGatherTimeout];
     [self startGatherTimeout];
-    // always start timeout timer
-    // timeout then reset to unknown
     
     switch (self.findStatus)
     {
@@ -108,18 +111,17 @@ int const kGatherTimeoutDuration = 1.0;
             {
                 self.findStatus = FindStatusFound;
                 
-                self.isFound = YES;
-                // TODO: delegate callback for success
-                [self.delegate ingredientBadgeDidFindBadge:self];
-                // TODO: write badges
+                [self logBadgeAsFound];
                 [self stopGatherTimeout];
-                [IngredientBadge writeBadges];
             }
             
             break;
             
         case FindStatusFound:
         default:
+            
+            [self stopGatherTimeout];
+            
             break;
     }
     
@@ -184,6 +186,13 @@ int const kGatherTimeoutDuration = 1.0;
     _isFound = isFound;
     
     self.findStatus = _isFound ? FindStatusFound : FindStatusUnknown;
+}
+
+- (void)logBadgeAsFound
+{
+    self.isFound = YES;
+    [self.delegate ingredientBadgeDidFindBadge:self];
+    [IngredientBadge writeBadges];
 }
 
 #pragma mark - File Handling
@@ -298,8 +307,12 @@ int const kGatherTimeoutDuration = 1.0;
     
     self.logCount = 0;
     self.gatherStartCount = 0;
-    [self.delegate ingredientBadgeDidTimeout:self];
     
+    if (self.findStatus != FindStatusUnknown)
+    {
+        self.findStatus = FindStatusUnknown;
+        [self.delegate ingredientBadgeDidTimeout:self];
+    }
 }
 
 @end

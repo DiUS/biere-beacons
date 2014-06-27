@@ -13,9 +13,12 @@
 #import <CoreLocation/CoreLocation.h>
 #import "CaptureManager.h"
 #import <MBProgressHUD.h>
+#import <CoreBluetooth/CoreBluetooth.h>
+#import <AudioToolbox/AudioServices.h>
 
 @interface BadgeViewController () <CLLocationManagerDelegate,
-IngredientBadgeDelegate, UIActionSheetDelegate, MBProgressHUDDelegate>
+IngredientBadgeDelegate, UIActionSheetDelegate, MBProgressHUDDelegate,
+CBCentralManagerDelegate>
 
 @property (nonatomic) NSArray *badges;
 @property (nonatomic) CLLocationManager *locationManager;
@@ -23,10 +26,14 @@ IngredientBadgeDelegate, UIActionSheetDelegate, MBProgressHUDDelegate>
 @property (nonatomic) CaptureManager *captureManager;
 @property (nonatomic) IngredientBadge *focussedBadge;
 @property (nonatomic) MBProgressHUD *hud;
+@property (nonatomic) UIImageView *gameStatusImageView;
+
 
 @end
 
-static NSString *kLockedBadgedImageName = @"locked";
+NSString * const kLockedBadgedImageName = @"locked";
+NSString * kBoundaryNotificationBody = \
+    @"You're in the game area. Starting finding ingredients!";
 static float kInset = 8.0f;
 
 @implementation BadgeViewController
@@ -39,7 +46,7 @@ static float kInset = 8.0f;
                                       [UICollectionViewFlowLayout alloc] init];
     
     layout.minimumInteritemSpacing = layout.minimumLineSpacing = kInset;
-    layout.itemSize = CGSizeMake(kCellSize, kCellSize);
+    layout.itemSize = CGSizeMake(kCellWidth, kCellHeight);
     layout.sectionInset = UIEdgeInsetsMake(kInset, kInset, kInset, kInset);
     
     if ((self = [super initWithCollectionViewLayout:layout]))
@@ -57,6 +64,16 @@ static float kInset = 8.0f;
 {
     [super viewDidLoad];
     
+    self.title = @"Found badges";
+    
+    UIBarButtonItem *infoItem = [[UIBarButtonItem alloc]
+                                 initWithTitle:@"?"
+                                 style:UIBarButtonItemStyleBordered
+                                 target:self
+                                 action:@selector(showGameInstructions)];
+
+    self.navigationItem.rightBarButtonItem = infoItem;
+    
     self.captureManager = [[CaptureManager alloc]
                            initWithBadges:self.badges];
     
@@ -64,12 +81,15 @@ static float kInset = 8.0f;
             forCellWithReuseIdentifier:kBadgeCellID];
     
     self.collectionView.backgroundColor =
-                [UIColor colorWithWhite:(70.0/255.0) alpha:1.0];
+                [UIColor colorWithWhite:(250.0/255.0) alpha:1.0];
     
     self.regionDefaults = [RegionDefaults sharedInstance];
     
     [self.locationManager
      startMonitoringForRegion:[self.regionDefaults beaconRegion]];
+    
+    [self.locationManager requestStateForRegion:
+     [self.regionDefaults beaconRegion]];
     
     NSNotificationCenter *nCenter = [NSNotificationCenter defaultCenter];
     
@@ -82,8 +102,11 @@ static float kInset = 8.0f;
                 selector:@selector(didReceiveNotification:)
                     name:UIApplicationDidBecomeActiveNotification
                   object:nil];
-    
-    DLog(@"Found Badges: %@", [self foundBadges]);
+
+    [nCenter addObserver:self
+                selector:@selector(didReceiveNotification:)
+                    name:kBoundaryNotificationBody
+                  object:nil];
 }
 
 #pragma mark - Public
@@ -127,6 +150,58 @@ static float kInset = 8.0f;
     return [self.badges filteredArrayUsingPredicate:predicate];
 }
 
+- (UIImageView *)gameStatusImageView
+{
+    if (!_gameStatusImageView)
+    {
+        _gameStatusImageView = [[UIImageView alloc]
+                                initWithFrame:self.view.frame];
+        [self.view addSubview:_gameStatusImageView];
+        _gameStatusImageView.hidden = YES;
+    }
+    
+    return _gameStatusImageView;
+}
+
+- (NSString *)gameBeaconUUID
+{
+    return [[[RegionDefaults sharedInstance] regionUUID] UUIDString];
+}
+
+- (NSInteger)gameMajor
+{
+    return 15295;
+}
+
+- (NSInteger)gameMinor
+{
+    return 49236;
+}
+
+- (NSPredicate *)gameBeaconPredicate
+{
+    return [NSPredicate predicateWithFormat:@"major = %ld AND minor = %ld",
+            [self gameMajor],
+            [self gameMinor]
+            ];
+}
+
+- (BOOL)isGameOver
+{
+    return [self foundBadges].count == self.badges.count;
+}
+
+- (void)showGameInstructions
+{
+    NSString *message = @"Rex Banner has enforced Prohibition in the office. You've got to stop him. Overcome these draconian measures by walking around the Queen Street office and finding all the ingredients needed to start your own production. Keep checking the fridge to see if you have them all.";
+    
+    [[[UIAlertView alloc] initWithTitle:@"Stop Rex Banner!"
+                                message:message
+                               delegate:nil
+                      cancelButtonTitle:@"Start"
+                      otherButtonTitles:nil] show];
+}
+
 #pragma mark Notification Callbacks
 
 - (void)didReceiveNotification:(NSNotification *)notification
@@ -143,7 +218,14 @@ static float kInset = 8.0f;
     {
         // enter foreground
         DLog(@"Entered Foreground");
-        [self startRangingBeaconRegion:[self.regionDefaults beaconRegion]];
+        [self.locationManager requestStateForRegion:
+         [self.regionDefaults beaconRegion]
+         ];
+    }
+    else if ([notification.name isEqualToString:kBoundaryNotificationBody])
+    {
+        if ([[self foundBadges] count] == 0)
+            [self showGameInstructions];
     }
 }
 
@@ -172,8 +254,8 @@ static float kInset = 8.0f;
         cell = [[BadgeCell alloc]
                 initWithFrame:CGRectMake(0.0,
                                          0.0,
-                                         kCellSize,
-                                         kCellSize)];
+                                         kCellWidth,
+                                         kCellHeight)];
         
     }
     
@@ -224,6 +306,20 @@ clickedButtonAtIndex:(NSInteger)buttonIndex
     self.focussedBadge = nil;
 }
 
+#pragma mark - CBCentralManagerDelegate
+
+- (void)centralManagerDidUpdateState:(CBCentralManager *)central
+{
+    
+    DLog(@"State: %ld", central.state);
+    
+    if (central.state == CBCentralManagerStatePoweredOn)
+    {
+        [self.locationManager requestStateForRegion:
+         [[RegionDefaults sharedInstance] beaconRegion]];
+    }
+}
+
 #pragma mark - CLLocationManagerDelegate
 
 #pragma mark Region Monitoring
@@ -261,13 +357,54 @@ didStartMonitoringForRegion:(CLRegion *)region
 {
     DLog(@"State: %ld for region: %@", (long)state, region);
     
+    BOOL isNotGameOver = ![self isGameOver];
+    BOOL isNoAppBadges = ([[UIApplication sharedApplication]
+                          applicationIconBadgeNumber] == 0);
+    BOOL isApplicationInBackground = ([[UIApplication sharedApplication]
+                          applicationState] == UIApplicationStateBackground);
     switch (state)
     {
         case CLRegionStateInside:
-            [self startRangingBeaconRegion:(CLBeaconRegion *)region];
+            
+            
+            // Notify
+            if (isNotGameOver &&
+                isNoAppBadges &&
+                isApplicationInBackground)
+            {
+                [[UIApplication sharedApplication]
+                 setApplicationIconBadgeNumber:1];
+                
+                UILocalNotification *notification = [
+                                        [UILocalNotification alloc] init];
+                notification.alertBody = kBoundaryNotificationBody;
+                [[UIApplication sharedApplication]
+                 presentLocalNotificationNow:notification];
+            }
+            
+            
+            if ([[UIApplication sharedApplication] applicationState] ==
+                UIApplicationStateActive)
+            {
+                [self startRangingBeaconRegion:(CLBeaconRegion *)region];
+            }
+            
+            
             break;
         default:
             [self stopRangingBeaconRegion:(CLBeaconRegion *)region];
+            
+            // To remove any notification that may be present when
+            // outside the boundary.
+            if ([[UIApplication sharedApplication] applicationIconBadgeNumber]
+                > 0)
+            {
+                [[UIApplication sharedApplication]
+                 setApplicationIconBadgeNumber: 0];
+                [[UIApplication sharedApplication]
+                 cancelAllLocalNotifications];
+            }
+            
             break;
     }
 }
@@ -278,6 +415,30 @@ didStartMonitoringForRegion:(CLRegion *)region
         didRangeBeacons:(NSArray *)beacons
                inRegion:(CLBeaconRegion *)region
 {
+    
+    CLBeacon *gameBeacon = [[beacons
+                            filteredArrayUsingPredicate:
+                            [self gameBeaconPredicate]
+                            ] firstObject];
+
+    if (gameBeacon &&
+        (gameBeacon.proximity == CLProximityNear ||
+         gameBeacon.proximity == CLProximityImmediate))
+    {
+        NSString *imageName = \
+                [self isGameOver] ? @"game_success" : @"game_error";
+        
+        self.gameStatusImageView.image = [UIImage imageNamed:imageName];
+        
+        if (self.gameStatusImageView.hidden)
+            self.gameStatusImageView.hidden = NO;
+        
+        return;
+    }
+    
+    if (!self.gameStatusImageView.hidden)
+        self.gameStatusImageView.hidden = YES;
+    
     if (beacons.count)
     {
         [self.captureManager logRangedBeacons:beacons];
@@ -289,7 +450,13 @@ didStartMonitoringForRegion:(CLRegion *)region
 rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
               withError:(NSError *)error
 {
-    DLog(@"Ranging beacons did fail");
+    DLog(@"Ranging beacons did fail: %@", error);
+    CBCentralManager *bluetoothManager = [[CBCentralManager alloc]
+                                 initWithDelegate:self
+                                 queue:dispatch_get_main_queue()];
+    
+    DLog(@"Bluetooth State: %ld", bluetoothManager.state);
+    [self centralManagerDidUpdateState:bluetoothManager];
 }
 
 #pragma mark - IngredientViewDelegate
@@ -321,7 +488,8 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
 	self.hud.labelText = @"Ingredient Spotted!";
     
 	[self.hud show:YES];
-	[self.hud hide:YES afterDelay:kGatherStartDelay];
+    
+    AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
 }
 
 - (void)ingredientBadgeDidStartGathering:(IngredientBadge *)badge
@@ -351,11 +519,6 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
     
     if (self.hud.mode == MBProgressHUDModeDeterminate)
         self.hud.progress = (logCount / (double)kNumSuccessiveLogs);
-    
-    CABasicAnimation *animation = [CABasicAnimation animation];
-    animation.fromValue = @(self.hud.progress);
-    animation.toValue = @(logCount / (double)kNumSuccessiveLogs);
-    animation.duration = 0.3;
 }
 
 - (void)ingredientBadgeDidFindBadge:(IngredientBadge *)badge
