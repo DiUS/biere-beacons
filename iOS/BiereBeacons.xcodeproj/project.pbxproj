@@ -32,6 +32,7 @@
 		B666D83219592ED10056CC58 /* BadgeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B666D83019592ED10056CC58 /* BadgeViewController.m */; };
 		B666D83319592ED10056CC58 /* BadgeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B666D83119592ED10056CC58 /* BadgeViewController.xib */; };
 		B666D838195935F40056CC58 /* IngredientBadge.m in Sources */ = {isa = PBXBuildFile; fileRef = B666D837195935F40056CC58 /* IngredientBadge.m */; };
+		B6C770E61960DFC200E83ADF /* UIColor+AppColors.m in Sources */ = {isa = PBXBuildFile; fileRef = B6C770E51960DFC200E83ADF /* UIColor+AppColors.m */; };
 		B6F5F5BB195945940076EB03 /* BadgeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F5F5BA195945940076EB03 /* BadgeCell.m */; };
 /* End PBXBuildFile section */
 
@@ -80,6 +81,8 @@
 		B666D83119592ED10056CC58 /* BadgeViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = BadgeViewController.xib; path = BiereBeacons/viewControllers/BadgeViewController.xib; sourceTree = "<group>"; };
 		B666D836195935F40056CC58 /* IngredientBadge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IngredientBadge.h; path = BiereBeacons/models/IngredientBadge.h; sourceTree = SOURCE_ROOT; };
 		B666D837195935F40056CC58 /* IngredientBadge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IngredientBadge.m; path = BiereBeacons/models/IngredientBadge.m; sourceTree = SOURCE_ROOT; };
+		B6C770E41960DFC200E83ADF /* UIColor+AppColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor+AppColors.h"; path = "BiereBeacons/UIColor+AppColors.h"; sourceTree = "<group>"; };
+		B6C770E51960DFC200E83ADF /* UIColor+AppColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIColor+AppColors.m"; path = "BiereBeacons/UIColor+AppColors.m"; sourceTree = "<group>"; };
 		B6F5F5B9195945940076EB03 /* BadgeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BadgeCell.h; path = BiereBeacons/Views/BadgeCell.h; sourceTree = "<group>"; };
 		B6F5F5BA195945940076EB03 /* BadgeCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BadgeCell.m; path = BiereBeacons/Views/BadgeCell.m; sourceTree = "<group>"; };
 		BC4BA658967A404FA449126A /* Pods-BiereBeacons.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BiereBeacons.xcconfig"; path = "Pods/Pods-BiereBeacons.xcconfig"; sourceTree = "<group>"; };
@@ -117,6 +120,8 @@
 		B654F5D2195D1BF6005AC697 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				B6C770E41960DFC200E83ADF /* UIColor+AppColors.h */,
+				B6C770E51960DFC200E83ADF /* UIColor+AppColors.m */,
 				B654F5D3195D1C3F005AC697 /* CLBeacon+Proximity.h */,
 				B654F5D4195D1C3F005AC697 /* CLBeacon+Proximity.m */,
 			);
@@ -290,6 +295,9 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = DiUS;
 				TargetAttributes = {
+					B666D7FC19592E190056CC58 = {
+						DevelopmentTeam = HR4LVL7TKY;
+					};
 					B666D81719592E1A0056CC58 = {
 						TestTargetID = B666D7FC19592E190056CC58;
 					};
@@ -379,6 +387,7 @@
 				B632E65B195AB2A00079B17A /* CaptureManager.m in Sources */,
 				B666D81119592E190056CC58 /* AppDelegate.m in Sources */,
 				B632E654195AB25F0079B17A /* IneligibleDeviceViewController.m in Sources */,
+				B6C770E61960DFC200E83ADF /* UIColor+AppColors.m in Sources */,
 				B654F5D5195D1C3F005AC697 /* CLBeacon+Proximity.m in Sources */,
 				B666D80D19592E190056CC58 /* main.m in Sources */,
 				B6F5F5BB195945940076EB03 /* BadgeCell.m in Sources */,
@@ -500,9 +509,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BiereBeacons/BiereBeacons-Prefix.pch";
 				INFOPLIST_FILE = "BiereBeacons/BiereBeacons-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -514,9 +525,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BiereBeacons/BiereBeacons-Prefix.pch";
 				INFOPLIST_FILE = "BiereBeacons/BiereBeacons-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

@@ -13,9 +13,7 @@
 @property (nonatomic) NSFileManager *fileManager;
 @property (nonatomic) NSArray *badges;
 @property (nonatomic) NSTimer *logTimout;
-@property (nonatomic) int gatherStartCount;
 @property (nonatomic) int logCount;
-@property (nonatomic) BadgeFindStatus findStatus;
 
 @end
 
@@ -29,9 +27,11 @@ NSString * const kMinorKey = @"minor";
 NSString * const kIsFoundKey = @"isFound";
 NSString * const kNameKey = @"name";
 NSString * const kImageURLKey = @"imageURL";
+NSString const *kFirstRun = @"firstRun";
 int const kNumSuccessiveLogs = 10;
-int const kGatherStartDelay = 3;
-int const kGatherTimeoutDuration = 2.0;
+//int const kGatherStartDelay = 3;
+double const kGameThreadDuration = 0.5;
+double const kGatherTimeoutDuration = 2.0;
 
 #pragma mark - Public API
 
@@ -72,57 +72,78 @@ int const kGatherTimeoutDuration = 2.0;
     return self.findStatus;
 }
 
-- (void)updateLogCount
+- (void)setFindStatus:(BadgeFindStatus)findStatus
 {
-    [self stopGatherTimeout];
-    [self startGatherTimeout];
+    _findStatus = findStatus;
     
-    switch (self.findStatus)
+    switch (_findStatus)
     {
         case FindStatusUnknown:
-            // update to spotted
-            self.findStatus = FindStatusSpotted;
-            // gatherStartCount = 0
-            self.gatherStartCount = 0;
-            [self.delegate ingredientBadgeDidSpotBadge:self];
+            
+            [self stopGatherTimeout];
             
             break;
+            
         case FindStatusSpotted:
-            // increment gatherStartCount
-            self.gatherStartCount += 1;
-            // if gatherStartCount == delay, start gathering
-            if (self.gatherStartCount == kGatherStartDelay)
-            {
-                self.findStatus = FindStatusGathering;
-                self.logCount = 0;
-                [self.delegate ingredientBadgeDidStartGathering:self];
-            }
+            
+            [self.delegate ingredientBadgeDidSpotBadge:self];
+            self.findStatus = FindStatusGatherReady;
+            
+            break;
+            
+        case FindStatusGatherReady:
+            
+            self.logCount = 0;
             
             break;
             
         case FindStatusGathering:
             
-            // increment logCount
-            self.logCount += 1;
-            [self.delegate ingredientBadge:self
-                         didUpdateLogCount:self.logCount];
-            // if log count == kNumSuccessiveLogs, then set to found
-            if (self.logCount == kNumSuccessiveLogs)
-            {
-                self.findStatus = FindStatusFound;
-                
-                [self logBadgeAsFound];
-                [self stopGatherTimeout];
-            }
+            [self.delegate ingredientBadgeDidStartGathering:self];
+            
+            break;
+            
+        case FindStatusGatherTimeout:
+            
+            [self.delegate ingredientBadgeDidTimeout:self];
+            self.findStatus = FindStatusGatherReady;
             
             break;
             
         case FindStatusFound:
-        default:
             
-            [self stopGatherTimeout];
+            [self.delegate ingredientBadgeDidFindBadge:self];
             
             break;
+            
+        case FindStatusLost:
+            
+            [self.delegate ingredientBadgeDidExitBadgeArea:self];
+            self.findStatus = FindStatusUnknown;
+            
+            break;
+            
+        default:
+            break;
+    }
+}
+
+- (void)updateLogCount
+{
+    [self stopGatherTimeout];
+    [self startGatherTimeout];
+    
+    // increment logCount
+    self.logCount += 1;
+    [self.delegate ingredientBadge:self
+                 didUpdateLogCount:self.logCount];
+    // if log count == kNumSuccessiveLogs, then set to found
+    if (self.logCount == (int)(kNumSuccessiveLogs / kGameThreadDuration))
+    {
+        self.findStatus = FindStatusFound;
+        
+        [self logBadgeAsFound];
+        [self stopGatherTimeout];
     }
     
     DLog(@"Update Log Count - State: %d", self.findStatus);
@@ -305,14 +326,7 @@ int const kGatherTimeoutDuration = 2.0;
 {
     [self stopGatherTimeout];
     
-    self.logCount = 0;
-    self.gatherStartCount = 0;
-    
-    if (self.findStatus != FindStatusUnknown)
-    {
-        self.findStatus = FindStatusUnknown;
-        [self.delegate ingredientBadgeDidTimeout:self];
-    }
+    self.findStatus = FindStatusGatherTimeout;
 }
 
 @end

@@ -15,9 +15,9 @@
 
 @interface CaptureManager()
 
-@property (nonatomic) NSArray *foundBeacons;
 @property (nonatomic) NSMutableArray *loggedBeacons;
 @property (nonatomic) NSDictionary *badges;
+@property (nonatomic) IngredientBadge *activeBadge;
 
 @end
 
@@ -48,14 +48,52 @@
 - (void)logRangedBeacons:(NSArray *)beacons
 {
     CLBeacon *closestBeacon = [beacons firstObject];
+    IngredientBadge *rangedBadge = [self badgeForBeacon:closestBeacon];
+    
+    // if ranged badge is found ignore updates
+    
+    if (self.activeBadge &&
+        self.activeBadge != rangedBadge)
+    {
+        self.activeBadge.findStatus = FindStatusLost;
+        self.activeBadge = nil;
+        return;
+    }
+    
+    if (!beacons.count)
+        return;
     
     if (closestBeacon)
     {
-        IngredientBadge *badge = [self badgeForBeacon:closestBeacon];
+        self.activeBadge = rangedBadge;
         
-        if (!badge.isFound && [closestBeacon isBeaconImmediate])
+        if (!self.activeBadge.isFound)
         {
-            [badge updateLogCount];
+            switch (self.activeBadge.findStatus)
+            {
+                case FindStatusUnknown:
+                    
+                    self.activeBadge.findStatus = FindStatusSpotted;
+                    
+                    break;
+                    
+                case FindStatusGatherReady:
+                    
+                    if ([closestBeacon isBeaconImmediate])
+                        self.activeBadge.findStatus = FindStatusGathering;
+                    
+                    break;
+                    
+                case FindStatusGathering:
+                    
+                    if ([closestBeacon isBeaconImmediate])
+                        [self.activeBadge updateLogCount];
+                    
+                    break;
+                    
+                default:
+                    break;
+            }
         }
     }
 }

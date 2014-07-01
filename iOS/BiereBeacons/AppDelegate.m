@@ -11,6 +11,7 @@
 #import "IngredientBadge.h"
 #import "RegionDefaults.h"
 #import "IneligibleDeviceViewController.h"
+#import "UIColor+AppColors.h"
 
 @interface AppDelegate()
 
@@ -18,8 +19,14 @@
 
 @implementation AppDelegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+- (BOOL)application:(UIApplication *)application
+didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    NSDictionary *appDefaults = [NSDictionary
+                         dictionaryWithObject:[NSNumber numberWithBool:YES]
+                                 forKey:kFirstRun];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
@@ -36,6 +43,11 @@
     
     UINavigationController *navCtrl = [[UINavigationController alloc]
                                        initWithRootViewController:rootVC];
+    [navCtrl.navigationBar setTitleTextAttributes:@{
+                    NSForegroundColorAttributeName : [UIColor appPaleYellow]
+                    }];
+    
+    [navCtrl.navigationBar setBarTintColor: [UIColor appPaleBrown]];
     
     self.window.rootViewController = navCtrl;
     

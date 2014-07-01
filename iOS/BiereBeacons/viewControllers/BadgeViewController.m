@@ -15,25 +15,27 @@
 #import <MBProgressHUD.h>
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <AudioToolbox/AudioServices.h>
+#import "UIColor+AppColors.h"
 
 @interface BadgeViewController () <CLLocationManagerDelegate,
 IngredientBadgeDelegate, UIActionSheetDelegate, MBProgressHUDDelegate,
 CBCentralManagerDelegate>
 
 @property (nonatomic) NSArray *badges;
+@property (nonatomic) NSArray *rangedBeacons;
 @property (nonatomic) CLLocationManager *locationManager;
 @property (nonatomic) RegionDefaults *regionDefaults;
 @property (nonatomic) CaptureManager *captureManager;
 @property (nonatomic) IngredientBadge *focussedBadge;
 @property (nonatomic) MBProgressHUD *hud;
 @property (nonatomic) UIImageView *gameStatusImageView;
-
+@property (nonatomic) NSTimer *gameThread;
 
 @end
 
 NSString * const kLockedBadgedImageName = @"locked";
 NSString * kBoundaryNotificationBody = \
-    @"You're in the game area. Starting finding ingredients!";
+    @"You're in the game area. Start finding ingredients!";
 static float kInset = 8.0f;
 
 @implementation BadgeViewController
@@ -71,7 +73,10 @@ static float kInset = 8.0f;
                                  style:UIBarButtonItemStyleBordered
                                  target:self
                                  action:@selector(showGameInstructions)];
-
+    [infoItem setTitleTextAttributes:@{
+                   NSForegroundColorAttributeName : [UIColor appPaleYellow]}
+                            forState:UIControlStateNormal];
+    
     self.navigationItem.rightBarButtonItem = infoItem;
     
     self.captureManager = [[CaptureManager alloc]
@@ -80,16 +85,11 @@ static float kInset = 8.0f;
     [self.collectionView registerClass:[BadgeCell class]
             forCellWithReuseIdentifier:kBadgeCellID];
     
-    self.collectionView.backgroundColor =
-                [UIColor colorWithWhite:(250.0/255.0) alpha:1.0];
+    self.collectionView.backgroundColor = [UIColor appPaleYellow];
     
     self.regionDefaults = [RegionDefaults sharedInstance];
     
-    [self.locationManager
-     startMonitoringForRegion:[self.regionDefaults beaconRegion]];
     
-    [self.locationManager requestStateForRegion:
-     [self.regionDefaults beaconRegion]];
     
     NSNotificationCenter *nCenter = [NSNotificationCenter defaultCenter];
     
@@ -107,11 +107,35 @@ static float kInset = 8.0f;
                 selector:@selector(didReceiveNotification:)
                     name:kBoundaryNotificationBody
                   object:nil];
+
+    // Show instuctions if first run
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSNumber *firstRun = (NSNumber *)[defaults
+                          objectForKey:kFirstRun];
+    if (firstRun.boolValue)
+    {
+        [self showGameInstructions];
+        [defaults setObject:[NSNumber numberWithBool:NO] forKey:kFirstRun];
+        [defaults synchronize];
+    }
+    
+    [self validateBluetoothStatus];
+    
 }
 
 #pragma mark - Public
 
 #pragma mark - Private
+
+- (NSArray *)rangedBeacons
+{
+    if (!_rangedBeacons)
+    {
+        _rangedBeacons = @[];
+    }
+    
+    return _rangedBeacons;
+}
 
 -(CLLocationManager *)locationManager
 {
@@ -193,13 +217,23 @@ static float kInset = 8.0f;
 
 - (void)showGameInstructions
 {
-    NSString *message = @"Rex Banner has enforced Prohibition in the office. You've got to stop him. Overcome these draconian measures by walking around the Queen Street office and finding all the ingredients needed to start your own production. Keep checking the fridge to see if you have them all.";
+    NSString *message = @"Rex Banner has enforced Prohibition in the office. You must stop him. Overcome these draconian measures by walking around the Queen Street office and finding all the ingredients needed to start your own beer production. After you find an ingredient, check the white fridge by standing in front of it to see if you have them all.";
     
     [[[UIAlertView alloc] initWithTitle:@"Stop Rex Banner!"
                                 message:message
                                delegate:nil
-                      cancelButtonTitle:@"Start"
+                      cancelButtonTitle:@"Okay"
                       otherButtonTitles:nil] show];
+}
+
+- (void)validateBluetoothStatus
+{
+    CBCentralManager *bluetoothManager = [[CBCentralManager alloc]
+                                          initWithDelegate:self
+                                          queue:dispatch_get_main_queue()];
+    
+    DLog(@"Bluetooth State: %ld", (unsigned long)bluetoothManager.state);
+    [self centralManagerDidUpdateState:bluetoothManager];
 }
 
 #pragma mark Notification Callbacks
@@ -212,21 +246,29 @@ static float kInset = 8.0f;
         // handle enter background notification
         DLog(@"Entered Background");
         [self stopRangingBeaconRegion:[self.regionDefaults beaconRegion]];
+        [self stopGameThread];
     }
     else if ([notification.name
               isEqualToString:UIApplicationDidBecomeActiveNotification])
     {
+        self.locationManager = nil;
         // enter foreground
+        [self.locationManager
+         startMonitoringForRegion:[self.regionDefaults beaconRegion]];
+        
+        [self.locationManager requestStateForRegion:
+         [self.regionDefaults beaconRegion]];
         DLog(@"Entered Foreground");
         [self.locationManager requestStateForRegion:
          [self.regionDefaults beaconRegion]
          ];
+        [self startGameThread];
     }
-    else if ([notification.name isEqualToString:kBoundaryNotificationBody])
-    {
-        if ([[self foundBadges] count] == 0)
-            [self showGameInstructions];
-    }
+//    else if ([notification.name isEqualToString:kBoundaryNotificationBody])
+//    {
+//        if ([[self foundBadges] count] == 0)
+//            [self showGameInstructions];
+//    }
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -313,10 +355,17 @@ clickedButtonAtIndex:(NSInteger)buttonIndex
     
     DLog(@"State: %ld", central.state);
     
-    if (central.state == CBCentralManagerStatePoweredOn)
-    {
-        [self.locationManager requestStateForRegion:
-         [[RegionDefaults sharedInstance] beaconRegion]];
+    switch (central.state) {
+        case CBCentralManagerStatePoweredOn:
+
+            [self.locationManager
+             requestStateForRegion:[self.regionDefaults beaconRegion]];
+            
+            break;
+            
+        default:
+            
+            break;
     }
 }
 
@@ -366,8 +415,7 @@ didStartMonitoringForRegion:(CLRegion *)region
     {
         case CLRegionStateInside:
             
-            
-            // Notify
+            // Notification when app is in background to play the game.
             if (isNotGameOver &&
                 isNoAppBadges &&
                 isApplicationInBackground)
@@ -416,34 +464,9 @@ didStartMonitoringForRegion:(CLRegion *)region
                inRegion:(CLBeaconRegion *)region
 {
     
-    CLBeacon *gameBeacon = [[beacons
-                            filteredArrayUsingPredicate:
-                            [self gameBeaconPredicate]
-                            ] firstObject];
-
-    if (gameBeacon &&
-        (gameBeacon.proximity == CLProximityNear ||
-         gameBeacon.proximity == CLProximityImmediate))
-    {
-        NSString *imageName = \
-                [self isGameOver] ? @"game_success" : @"game_error";
-        
-        self.gameStatusImageView.image = [UIImage imageNamed:imageName];
-        
-        if (self.gameStatusImageView.hidden)
-            self.gameStatusImageView.hidden = NO;
-        
-        return;
-    }
+    self.rangedBeacons = beacons;
     
-    if (!self.gameStatusImageView.hidden)
-        self.gameStatusImageView.hidden = YES;
-    
-    if (beacons.count)
-    {
-        [self.captureManager logRangedBeacons:beacons];
-        DLog(@"did range beacons. %ld", beacons.count);
-    }
+    DLog(@"did range beacons. %ld", (unsigned long)beacons.count);
 }
 
 - (void)locationManager:(CLLocationManager *)manager
@@ -451,15 +474,10 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
               withError:(NSError *)error
 {
     DLog(@"Ranging beacons did fail: %@", error);
-    CBCentralManager *bluetoothManager = [[CBCentralManager alloc]
-                                 initWithDelegate:self
-                                 queue:dispatch_get_main_queue()];
-    
-    DLog(@"Bluetooth State: %ld", bluetoothManager.state);
-    [self centralManagerDidUpdateState:bluetoothManager];
+    [self validateBluetoothStatus];
 }
 
-#pragma mark - IngredientViewDelegate
+#pragma mark - IngredientBadgeDelegate
 
 - (void)ingredientBadgeDidSpotBadge:(IngredientBadge *)badge
 {
@@ -486,8 +504,10 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
     
 	self.hud.delegate = self;
 	self.hud.labelText = @"Ingredient Spotted!";
+    self.hud.detailsLabelText = @"Get closer to the ingredient to gather it.";
     
 	[self.hud show:YES];
+//    [self.hud hide:YES afterDelay:3];
     
     AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
 }
@@ -518,7 +538,7 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
     }
     
     if (self.hud.mode == MBProgressHUDModeDeterminate)
-        self.hud.progress = (logCount / (double)kNumSuccessiveLogs);
+        self.hud.progress = (logCount / (kNumSuccessiveLogs / kGameThreadDuration));
 }
 
 - (void)ingredientBadgeDidFindBadge:(IngredientBadge *)badge
@@ -553,6 +573,25 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
     [self refreshBadges];
 }
 
+- (void)ingredientBadgeDidExitBadgeArea:(IngredientBadge *)badge
+{
+    [self hideCurrentHUD];
+    
+    if (!badge.isFound)
+    {
+        self.hud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
+        [self.navigationController.view addSubview:self.hud];
+        
+        self.hud.mode = MBProgressHUDModeText;
+        
+        self.hud.labelText = @"Lost ingredient :(";
+        self.hud.detailsLabelText = @"Keep looking...";
+        
+        [self.hud show:YES];
+        [self.hud hide:YES afterDelay:3.0];
+    }
+}
+
 - (void)ingredientBadgeDidTimeout:(IngredientBadge *)badge
 {
     DLog(@"Did timeout badge find");
@@ -562,13 +601,25 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
     self.hud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
 	[self.navigationController.view addSubview:self.hud];
     
-    self.hud.mode = MBProgressHUDModeText;
+    // Recommended icon size for progress hud.
+    UIImageView *customView = [[UIImageView alloc]
+                               initWithFrame:CGRectMake(0.0,
+                                                        0.0,
+                                                        100.0,
+                                                        100.0)
+                               ];
+    customView.contentMode = UIViewContentModeScaleAspectFit;
+    customView.image = [UIImage imageNamed:kLockedBadgedImageName];
     
-	self.hud.labelText = @"Lost ingredient!";
-	self.hud.detailsLabelText = @"Keep looking";
+    self.hud.customView = customView;
+    
+	// Set custom view mode
+	self.hud.mode = MBProgressHUDModeCustomView;
+    
+	self.hud.labelText = @"Gather timed out.";
+	self.hud.detailsLabelText = @"You probably weren't close enough to the ingredient, but you're still near it, so try again.";
     
     [self.hud show:YES];
-    [self.hud hide:YES afterDelay:3.0];
 }
 
 #pragma mark - MBProgressHudDelegate
@@ -579,13 +630,6 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
 	self.hud = nil;
 }
 
-- (void)onLogUpdate:(NSNumber *)logCount
-{
-    float progress = (logCount.floatValue / kNumSuccessiveLogs);
-    self.hud.progress = progress;
-    usleep(50000);
-}
-
 - (void)hideCurrentHUD
 {
     if (self.hud)
@@ -594,6 +638,71 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
         [self.hud removeFromSuperview];
         self.hud = nil;
     }
+}
+
+#pragma mark - GameThread
+
+- (void)startGameThread
+{
+    if (!self.gameThread)
+    {
+        self.gameThread = [NSTimer
+                           scheduledTimerWithTimeInterval:kGameThreadDuration
+                           target:self
+                           selector:@selector(updateGame:)
+                           userInfo:nil
+                           repeats:YES
+                           ];
+        DLog(@"Started Game Thread");
+    }
+}
+
+- (void)stopGameThread
+{
+    [self.gameThread invalidate];
+    self.gameThread = nil;
+    
+    DLog(@"Stopped Game Thread");
+}
+
+- (void)updateGame:(NSTimer *)timer
+{
+    DLog(@"Update Game: %@", self.rangedBeacons);
+    
+    NSArray *beacons = self.rangedBeacons;
+    
+    CLBeacon *gameBeacon = [[beacons
+                             filteredArrayUsingPredicate:
+                             [self gameBeaconPredicate]
+                             ] firstObject];
+    
+    if (gameBeacon &&
+        (gameBeacon.proximity == CLProximityImmediate ||
+         gameBeacon.proximity == CLProximityNear)
+        )
+    {
+        NSString *imageName = \
+        [self isGameOver] ? @"game_success" : @"game_error";
+        
+        self.gameStatusImageView.image = [UIImage imageNamed:imageName];
+        
+        if (self.gameStatusImageView.hidden)
+            self.gameStatusImageView.hidden = NO;
+        
+        return;
+    }
+    
+    if (!self.gameStatusImageView.hidden)
+        self.gameStatusImageView.hidden = YES;
+    
+    NSPredicate *excludeGameBeacon = [NSPredicate
+                                      predicateWithFormat:@"major != %ld",
+                                      [self gameMajor]];
+    
+    NSArray *badgeBeacons = [beacons
+                             filteredArrayUsingPredicate:excludeGameBeacon];
+    
+    [self.captureManager logRangedBeacons: badgeBeacons];
 }
 
 @end

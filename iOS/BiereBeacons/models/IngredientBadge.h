@@ -18,6 +18,7 @@
       didUpdateLogCount:(int)logCount;
 - (void)ingredientBadgeDidFindBadge:(IngredientBadge *)badge;
 - (void)ingredientBadgeDidTimeout:(IngredientBadge *)badge;
+- (void)ingredientBadgeDidExitBadgeArea:(IngredientBadge *)badge;
 
 @end
 
@@ -25,15 +26,19 @@ typedef enum {
 	
 	FindStatusUnknown,
     FindStatusSpotted,
+    FindStatusGatherReady,
     FindStatusGathering,
+    FindStatusGatherTimeout,
+    FindStatusLost,
     FindStatusFound
     
 } BadgeFindStatus;
 
-extern const int kNumSuccessiveLogs;
-extern const int kGatherStartDelay;
-
 @interface IngredientBadge : NSObject
+
+extern const int kNumSuccessiveLogs;
+extern const double kGameThreadDuration;
+extern NSString *kFirstRun;
 
 @property (nonatomic) NSString *name;
 @property (nonatomic) BOOL isFound;
@@ -43,6 +48,7 @@ extern const int kGatherStartDelay;
 @property (nonatomic) NSString *uuid;
 @property (nonatomic) NSInteger major;
 @property (nonatomic) NSInteger minor;
+@property (nonatomic) BadgeFindStatus findStatus;
 @property (nonatomic, weak) id <IngredientBadgeDelegate> delegate;
 
 + (NSArray *)badges;
@@ -51,6 +57,5 @@ extern const int kGatherStartDelay;
 - (id)initWithName:(NSString *)name;
 - (void)updateLogCount;
 - (void)logBadgeAsFound;
-- (BadgeFindStatus)badgeFindStatus;
 
 @end
