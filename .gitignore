@@ -1,4 +1,17 @@
 .DS_Store
+*.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+local.properties
+.classpath
+.project
+.idea
+.gradle
+build/
+Android/BiereBeacons/build/
 Android/.metadata/
 Android/BiereBeacons/bin/
 iOS/BiereBeacons.xcodeproj/project.xcworkspace/xcshareddata/
