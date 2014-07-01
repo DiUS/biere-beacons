@@ -194,12 +194,12 @@ static float kInset = 8.0f;
 
 - (NSInteger)gameMajor
 {
-    return 15295;
+    return 0;
 }
 
 - (NSInteger)gameMinor
 {
-    return 49236;
+    return 0;
 }
 
 - (NSPredicate *)gameBeaconPredicate
@@ -677,8 +677,7 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
                              ] firstObject];
     
     if (gameBeacon &&
-        (gameBeacon.proximity == CLProximityImmediate ||
-         gameBeacon.proximity == CLProximityNear)
+        (gameBeacon.proximity == CLProximityImmediate)
         )
     {
         NSString *imageName = \

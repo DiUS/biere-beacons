@@ -297,6 +297,14 @@
 				TargetAttributes = {
 					B666D7FC19592E190056CC58 = {
 						DevelopmentTeam = HR4LVL7TKY;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.iOS = {
+								enabled = 0;
+							};
+						};
 					};
 					B666D81719592E1A0056CC58 = {
 						TestTargetID = B666D7FC19592E190056CC58;

@@ -52,6 +52,7 @@
         _beaconRegion = [[CLBeaconRegion alloc]
                          initWithProximityUUID:[self regionUUID]
                          identifier:[self regionID]];
+        [_beaconRegion setNotifyEntryStateOnDisplay:YES];
     }
     
     return _beaconRegion;

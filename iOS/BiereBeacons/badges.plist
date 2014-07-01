@@ -14,15 +14,15 @@
 		<key>imageURL</key>
 		<string>barley</string>
 		<key>isFound</key>
-		<false/>
+		<true/>
 	</dict>
 	<dict>
 		<key>uuid</key>
 		<string>b9407f30-f5f8-466e-aff9-25556b57fe6d</string>
 		<key>major</key>
-		<integer>111</integer>
+		<integer>15295</integer>
 		<key>minor</key>
-		<integer>222</integer>
+		<integer>49236</integer>
 		<key>name</key>
 		<string>Yeast</string>
 		<key>imageURL</key>
