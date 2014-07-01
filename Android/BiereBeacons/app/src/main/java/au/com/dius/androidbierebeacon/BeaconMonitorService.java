@@ -26,7 +26,8 @@ import au.com.dius.androidbierebeacon.R;
 
 
 public class BeaconMonitorService extends Service {
-	
+
+    // service binder
 	private final IBinder mBinder = new BeaconBinder();
 	
 	public class BeaconBinder extends Binder {
@@ -34,13 +35,20 @@ public class BeaconMonitorService extends Service {
 			return BeaconMonitorService.this;
 		}
 	}
-	
+
+    // intents
+    final static String MONITOR_INTENT = "beacon_monitor_intent";
 	final static String RANGED_INTENT = "beacon_ranged_intent";
 	final static String BEACONS_INTENT = "beacons_intent";
-	final static String TAG = "DiUSBeaconNotification";
+
+    // class
+	final static String TAG = BeaconMonitorService.class.getName();
 	final static int ID = 12345;
-	final static String PREF_FORMAT = "%d - %s";
-	
+
+    // other
+    final static String PREF_FORMAT = "%d - %s";
+
+    // enums
 	enum NOTIFY_TYPE {
 		ENTERED,
 		EXITED
@@ -203,7 +211,25 @@ public class BeaconMonitorService extends Service {
 			saveNotification(NOTIFY_TYPE.EXITED, reg);
 		}
 	}
-	
+
+    public void startMonitoring(Region region) {
+        try {
+            beaconManager.startMonitoring(region);
+        } catch (RemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void stopMonitoring(Region region) {
+        try {
+            beaconManager.stopMonitoring(region);
+        } catch (RemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
 	public void startRanging(Region region) {
 		try {
 			beaconManager.startRanging(region);

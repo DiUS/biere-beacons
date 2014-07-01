@@ -1,6 +1,8 @@
 package au.com.dius.androidbierebeacon;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -12,7 +14,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.estimote.sdk.Beacon;
@@ -25,14 +32,16 @@ import java.util.List;
 import au.com.dius.androidbierebeacon.BeaconMonitorService.BeaconBinder;
 
 public class AwardsActivity extends Activity implements ServiceConnection {
-	
+
+    final static int SPOTTED_REQ_COUNT = 6;
+    final static String TAG = AwardsActivity.class.getName();
+
 	private BeaconBinder mBeaconBinder;
     private BadgeArrayAdapter badgeArrayAdapter;
-    private Toast awardToast;
+    private List<Badge> mBadges;
+    private ProgressDialog gatheringDialog;
+    private Toast spottedToast;
     //private Game game;
-    final static int TOAST_LENGTH = 2;
-
-
 	
 	@Override
 	protected void onPause() {
@@ -65,78 +74,63 @@ public class AwardsActivity extends Activity implements ServiceConnection {
 		setContentView(R.layout.awards);
 		LocalBroadcastManager.getInstance(this).registerReceiver(mRangingReceiver, new IntentFilter(BeaconMonitorService.RANGED_INTENT));
 
-        List<Badge> badges = new ArrayList<Badge>();
-        badges.add(new Badge(MainActivity.region_green, R.drawable.hops));
-        badges.add(new Badge(MainActivity.region_blue, R.drawable.water));
-        badges.add(new Badge(MainActivity.region_phone_1, R.drawable.yeast));
-        badges.add(new Badge(MainActivity.region_phone_2, R.drawable.barley));
+        this.mBadges = new ArrayList<Badge>();
+        this.mBadges.add(new Badge(MainActivity.region_green, R.drawable.hops));
+        this.mBadges.add(new Badge(MainActivity.region_blue, R.drawable.water));
+        this.mBadges.add(new Badge(MainActivity.region_phone_1, R.drawable.yeast));
+        this.mBadges.add(new Badge(MainActivity.region_phone_2, R.drawable.barley));
 
-        for(Badge badge : badges) {
+        // setup the badge array adapter for the view
+        this.badgeArrayAdapter = new BadgeArrayAdapter(this, R.layout.badge, new ArrayList<Badge>());
+
+        // load unlocked badges
+        for(Badge badge : this.mBadges) {
             badge.load(this);
+            if(badge.isUnlocked()) {
+                this.badgeArrayAdapter.add(badge);
+            }
         }
 
-        this.badgeArrayAdapter = new BadgeArrayAdapter(this, R.layout.badge, badges);
         GridView gridView = (GridView) findViewById(R.id.badgeView);
         gridView.setAdapter(this.badgeArrayAdapter);
 
-        awardToast = new Toast(AwardsActivity.this);
+
+        // create dialogs and notifications
+        gatheringDialog = new ProgressDialog(this);
+        gatheringDialog.setMax(AwardsActivity.SPOTTED_REQ_COUNT);
+        gatheringDialog.setProgress(0);
+        gatheringDialog.setMessage("Gathering Ingredient!");
+        gatheringDialog.setCancelable(false);
+
+        spottedToast = Toast.makeText(AwardsActivity.this, "Ingredient Spotted", Toast.LENGTH_SHORT);
 	}
 	
 	private BroadcastReceiver mRangingReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			ArrayList<Beacon> beacons = intent.getParcelableArrayListExtra(BeaconMonitorService.BEACONS_INTENT);
-			
+
+            // not near beacon?
 			if(beacons.isEmpty()) {
 				return;
 			}
 			
 			// get first beacon - assumes it is the closest (according to estimote sdk)
-            if(Utils.isBeaconInRegion(beacons.get(0), MainActivity.region_purple)) {
-                boolean gameFinished = false;
-                // check if all badges are unlocked
-                for(int i = 0; i < AwardsActivity.this.badgeArrayAdapter.getCount(); i++) {
-                    Badge b = AwardsActivity.this.badgeArrayAdapter.getItem(i);
+            Beacon beacon = beacons.get(0);
 
-                    if(!b.isUnlocked()) {
-                        break;
-                    }
-
-                }
-                if(gameFinished) {
-                    Intent successIntent = new Intent(AwardsActivity.this, GameSuccess.class);
-                    startActivity(successIntent);
-                }
-                else {
-                    Intent successIntent = new Intent(AwardsActivity.this, GameDenied.class);
-                    startActivity(successIntent);
-                }
+            // check if is not game beacon
+            if(!Utils.isBeaconInRegion(beacon, MainActivity.region_purple)) {
+                beaconUpdate(beacon);
             }
-
-			Badge badge = AwardsActivity.this.getBeaconBadge(beacons.get(0));
-            if(badge != null && !badge.isUnlocked()) {
-
-                if(Utils.computeProximity(beacons.get(0)) == Utils.Proximity.NEAR ||
-                   Utils.computeProximity(beacons.get(0)) == Utils.Proximity.FAR ||
-                   Utils.computeProximity(beacons.get(0)) == Utils.Proximity.UNKNOWN ) {
-                    awardToast.cancel();
-                    awardToast = Toast.makeText(AwardsActivity.this, "Ingredient Spotted", TOAST_LENGTH);
-                    awardToast.show();
-                }
-                else {
-                    awardToast.cancel();
-                    awardToast = Toast.makeText(AwardsActivity.this, "Gathering Ingredient", TOAST_LENGTH);
-                    awardToast.show();
-
-                    badge.spotted();
-
-                    if (badge.spottedCount() > 5) {
-                        badge.unlock();
-                        badge.save(AwardsActivity.this);
-                        AwardsActivity.this.badgeArrayAdapter.notifyDataSetChanged();
-
-
-                    }
+            // first beacon is game beacon, check if near the game beacon
+            else if(isNearGameBeacon(beacon)) {
+                gameUpdate();
+            }
+            else {
+                // not near the game beacon, get next beacon
+                if(beacons.size() > 2) {
+                    beacon = beacons.get(1);
+                    beaconUpdate(beacon);
                 }
             }
 		}
@@ -152,8 +146,8 @@ public class AwardsActivity extends Activity implements ServiceConnection {
 	}
 
 	protected Badge getBeaconBadge(Beacon beacon) {
-        for(int i = 0; i < this.badgeArrayAdapter.getCount(); i++) {
-            Badge badge = this.badgeArrayAdapter.getItem(i);
+        for(int i = 0; i < this.mBadges.size(); i++) {
+            Badge badge = this.mBadges.get(i);
             Region region = badge.region();
 
             // use estimote utils to determine if the region and beacons are the "same"
@@ -169,7 +163,66 @@ public class AwardsActivity extends Activity implements ServiceConnection {
 		mBeaconBinder = null;
 	}
 
+    private boolean isNearGameBeacon(Beacon beacon) {
+        if(Utils.isBeaconInRegion(beacon, MainActivity.region_purple) &&
+           Utils.computeProximity(beacon) == Utils.Proximity.IMMEDIATE) {
+            return true;
+        }
+        return false;
+    }
+
+    private void gameUpdate() {
+        boolean gameFinished = true;
+        // check if all badges are unlocked
+        for (int i = 0; i < AwardsActivity.this.mBadges.size(); i++) {
+            Badge b = AwardsActivity.this.mBadges.get(i);
+
+            if (!b.isUnlocked()) {
+                gameFinished = false;
+                break;
+            }
+        }
+        if (gameFinished) {
+            Log.d(TAG, "Game success: %s");
+            Intent successIntent = new Intent(AwardsActivity.this, GameSuccess.class);
+            startActivity(successIntent);
+            return;
+        } else {
+            Log.d(TAG, "Game denied: %s");
+            Intent deniedIntent = new Intent(AwardsActivity.this, GameDenied.class);
+            startActivity(deniedIntent);
+            return;
+        }
+    }
+
+    void beaconUpdate(Beacon beacon) {
+        Badge badge = AwardsActivity.this.getBeaconBadge(beacon);
+        if (badge != null && !badge.isUnlocked()) {
+
+            if (Utils.computeProximity(beacon) == Utils.Proximity.NEAR ||
+                    Utils.computeProximity(beacon) == Utils.Proximity.FAR ||
+                    Utils.computeProximity(beacon) == Utils.Proximity.UNKNOWN) {
+                gatheringDialog.cancel();
+                spottedToast.show();
+                Log.d("AwardsActivity", "show spotted");
+            } else {
+                spottedToast.cancel();
+                badge.spotted();
+
+                gatheringDialog.setProgress(badge.spottedCount());
+                gatheringDialog.show();
+
+                Log.d("AwardsActivity", "show gathering");
 
 
-
+                if (badge.spottedCount() > AwardsActivity.SPOTTED_REQ_COUNT) {
+                    badge.unlock();
+                    badge.save(AwardsActivity.this);
+                    AwardsActivity.this.badgeArrayAdapter.add(badge);
+                    //AwardsActivity.this.badgeArrayAdapter.notifyDataSetChanged();
+                    gatheringDialog.cancel();
+                }
+            }
+        }
+    }
 }

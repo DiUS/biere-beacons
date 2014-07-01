@@ -11,7 +11,10 @@ import com.estimote.sdk.Region;
 
 import au.com.dius.androidbierebeacon.R;
 
-/* Notification Activity to start the Beacon Notification Service
+/* Main Activity
+ * Start BeaconMonitorService
+ * Check bluetooth on
+ * Start main game activity
  */
 
 public class MainActivity extends Activity {
@@ -19,7 +22,7 @@ public class MainActivity extends Activity {
     final static int REQUEST_ENABLE_BT = 1;
 
 	final static String REGION = "region";
-	final static String TAG = "DiUSBeaconNotification";
+	final static String TAG = MainActivity.class.getName();
 	final static String PREF_FORMAT = "%d - %s";
 	
 	// TODO: Should put these in an external file
@@ -33,7 +36,7 @@ public class MainActivity extends Activity {
     // yeast, region based
     final static Region region_phone_1 = new Region("dius_region_phone_1", "b9407f30-f5f8-466e-aff9-25556b57fe6d", 111, 222);
     // barley, region based
-    final static Region region_phone_2 = new Region("dius_region_phone_2", "b9407f30-f5f8-466e-aff9-25556b57fe6d", 2, 1);
+    final static Region region_phone_2 = new Region("dius_region_phone_2", "b9407f30-f5f8-466e-aff9-25556b57fe6d", 1, 2);
 
 
 	@Override
@@ -62,13 +65,13 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		Log.d("main activity", "paused");
+		Log.d(TAG, "paused");
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.d("main activity", "resumed");
+		Log.d(TAG, "resumed");
 	}
 
     private void isBluetoothOn() {
@@ -78,6 +81,7 @@ public class MainActivity extends Activity {
             // Device does not support Bluetooth
         }
 
+        // Request user to turn on bluetooth
         if(!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
