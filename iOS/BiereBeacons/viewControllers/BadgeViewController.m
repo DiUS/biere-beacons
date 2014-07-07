@@ -217,7 +217,7 @@ static float kInset = 8.0f;
 
 - (void)showGameInstructions
 {
-    NSString *message = @"Rex Banner has enforced Prohibition in the office. You must stop him. Overcome these draconian measures by walking around the Queen Street office and finding all the ingredients needed to start your own beer production. \n\nYou'll be notified when you're close to an ingredient. Stay close and wait until the progress circle completes to successfully retrieve it. \n\nUpon finding an ingredient you'll receive a badge. Once you gather a new badge check the white fridge by standing in front of it to see if you have them all. You start with the 'barley' badge.";
+    NSString *message = @"Rex Banner has enforced Prohibition in the office. You must stop him. Overcome these draconian measures by walking around the Queen Street office and finding all the ingredients needed to start your own beer production. \n\nYou'll be notified when you're near an ingredient. Stay close and wait until the progress circle completes to successfully retrieve it. \n\nUpon finding an ingredient you'll receive a badge. Once you gather a new badge check the white fridge by standing in front of it to see if you have them all. You start with the 'barley' badge.";
     
     [[[UIAlertView alloc] initWithTitle:@"Stop Rex Banner!"
                                 message:message

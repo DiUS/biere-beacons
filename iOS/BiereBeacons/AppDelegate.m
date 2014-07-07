@@ -12,14 +12,18 @@
 #import "RegionDefaults.h"
 #import "IneligibleDeviceViewController.h"
 #import "UIColor+AppColors.h"
+#import "UserActionDetailViewController.h"
+#import "BeaconManager.h"
+#import "GameViewController.h"
 
-@interface AppDelegate()
+@interface AppDelegate() <CLLocationManagerDelegate>
 
 @end
 
 @implementation AppDelegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+- (BOOL)application:(UIApplication *)application
+didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     NSDictionary *appDefaults = [NSDictionary
                          dictionaryWithObject:[NSNumber numberWithBool:YES]
@@ -40,14 +44,17 @@
         rootVC = [[IneligibleDeviceViewController alloc] init];
     }
     
+    rootVC = [[GameViewController alloc] init];
+    
     UINavigationController *navCtrl = [[UINavigationController alloc]
                                        initWithRootViewController:rootVC];
+    
     [navCtrl.navigationBar setTitleTextAttributes:@{
                     NSForegroundColorAttributeName : [UIColor appPaleYellow]
                     }];
     
     [navCtrl.navigationBar setBarTintColor: [UIColor appPaleBrown]];
-    
+    [navCtrl.topViewController.view setBackgroundColor: [UIColor appPaleYellow]];
     self.window.rootViewController = navCtrl;
     
     return YES;

@@ -20,9 +20,9 @@
 		<key>uuid</key>
 		<string>b9407f30-f5f8-466e-aff9-25556b57fe6d</string>
 		<key>major</key>
-		<integer>15295</integer>
+		<real>15295</real>
 		<key>minor</key>
-		<integer>49236</integer>
+		<real>49236</real>
 		<key>name</key>
 		<string>Yeast</string>
 		<key>imageURL</key>
@@ -34,9 +34,9 @@
 		<key>uuid</key>
 		<string>b9407f30-f5f8-466e-aff9-25556b57fe6d</string>
 		<key>major</key>
-		<integer>23491</integer>
+		<real>23491</real>
 		<key>minor</key>
-		<integer>36886</integer>
+		<real>36886</real>
 		<key>name</key>
 		<string>Water</string>
 		<key>imageURL</key>
@@ -48,9 +48,9 @@
 		<key>uuid</key>
 		<string>b9407f30-f5f8-466e-aff9-25556b57fe6d</string>
 		<key>major</key>
-		<integer>50730</integer>
+		<real>50730</real>
 		<key>minor</key>
-		<integer>33558</integer>
+		<real>33558</real>
 		<key>name</key>
 		<string>Hops</string>
 		<key>imageURL</key>

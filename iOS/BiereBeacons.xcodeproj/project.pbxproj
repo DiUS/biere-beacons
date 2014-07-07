@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0773DB1D8D2442B8B311C00E /* libPods-BiereBeaconsTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD090A8904724FEAAF98E618 /* libPods-BiereBeaconsTests.a */; };
 		2E4B93FEAD3E456181A8A3D9 /* libPods-BiereBeacons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2A5FB779FDF4BB1A795F467 /* libPods-BiereBeacons.a */; };
 		B606CA41195BDD4C000A9B75 /* badges.plist in Resources */ = {isa = PBXBuildFile; fileRef = B606CA40195BDD4C000A9B75 /* badges.plist */; };
 		B632E654195AB25F0079B17A /* IneligibleDeviceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B632E652195AB25F0079B17A /* IneligibleDeviceViewController.m */; };
@@ -32,6 +33,10 @@
 		B666D83219592ED10056CC58 /* BadgeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B666D83019592ED10056CC58 /* BadgeViewController.m */; };
 		B666D83319592ED10056CC58 /* BadgeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B666D83119592ED10056CC58 /* BadgeViewController.xib */; };
 		B666D838195935F40056CC58 /* IngredientBadge.m in Sources */ = {isa = PBXBuildFile; fileRef = B666D837195935F40056CC58 /* IngredientBadge.m */; };
+		B69CBC2219663C560091931B /* UserActionDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B69CBC2019663C560091931B /* UserActionDetailViewController.m */; };
+		B69CBC2319663C560091931B /* UserActionDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B69CBC2119663C560091931B /* UserActionDetailViewController.xib */; };
+		B69CBC27196661720091931B /* BeaconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B69CBC26196661720091931B /* BeaconManager.m */; };
+		B69CBC2A196668D50091931B /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B69CBC29196668D50091931B /* GameViewController.m */; };
 		B6C770E61960DFC200E83ADF /* UIColor+AppColors.m in Sources */ = {isa = PBXBuildFile; fileRef = B6C770E51960DFC200E83ADF /* UIColor+AppColors.m */; };
 		B6F5F5BB195945940076EB03 /* BadgeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F5F5BA195945940076EB03 /* BadgeCell.m */; };
 /* End PBXBuildFile section */
@@ -81,12 +86,21 @@
 		B666D83119592ED10056CC58 /* BadgeViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = BadgeViewController.xib; path = BiereBeacons/viewControllers/BadgeViewController.xib; sourceTree = "<group>"; };
 		B666D836195935F40056CC58 /* IngredientBadge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IngredientBadge.h; path = BiereBeacons/models/IngredientBadge.h; sourceTree = SOURCE_ROOT; };
 		B666D837195935F40056CC58 /* IngredientBadge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IngredientBadge.m; path = BiereBeacons/models/IngredientBadge.m; sourceTree = SOURCE_ROOT; };
+		B69CBC1F19663C560091931B /* UserActionDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UserActionDetailViewController.h; path = BiereBeacons/viewControllers/UserActionDetailViewController.h; sourceTree = "<group>"; };
+		B69CBC2019663C560091931B /* UserActionDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UserActionDetailViewController.m; path = BiereBeacons/viewControllers/UserActionDetailViewController.m; sourceTree = "<group>"; };
+		B69CBC2119663C560091931B /* UserActionDetailViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = UserActionDetailViewController.xib; path = BiereBeacons/viewControllers/UserActionDetailViewController.xib; sourceTree = "<group>"; };
+		B69CBC25196661720091931B /* BeaconManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BeaconManager.h; path = managers/BeaconManager.h; sourceTree = "<group>"; };
+		B69CBC26196661720091931B /* BeaconManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BeaconManager.m; path = managers/BeaconManager.m; sourceTree = "<group>"; };
+		B69CBC28196668D50091931B /* GameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameViewController.h; path = BiereBeacons/viewControllers/GameViewController.h; sourceTree = "<group>"; };
+		B69CBC29196668D50091931B /* GameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GameViewController.m; path = BiereBeacons/viewControllers/GameViewController.m; sourceTree = "<group>"; };
 		B6C770E41960DFC200E83ADF /* UIColor+AppColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor+AppColors.h"; path = "BiereBeacons/UIColor+AppColors.h"; sourceTree = "<group>"; };
 		B6C770E51960DFC200E83ADF /* UIColor+AppColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIColor+AppColors.m"; path = "BiereBeacons/UIColor+AppColors.m"; sourceTree = "<group>"; };
 		B6F5F5B9195945940076EB03 /* BadgeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BadgeCell.h; path = BiereBeacons/Views/BadgeCell.h; sourceTree = "<group>"; };
 		B6F5F5BA195945940076EB03 /* BadgeCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BadgeCell.m; path = BiereBeacons/Views/BadgeCell.m; sourceTree = "<group>"; };
+		B8ADF7C9ED20494296DAB7EE /* Pods-BiereBeaconsTests.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BiereBeaconsTests.xcconfig"; path = "Pods/Pods-BiereBeaconsTests.xcconfig"; sourceTree = "<group>"; };
 		BC4BA658967A404FA449126A /* Pods-BiereBeacons.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BiereBeacons.xcconfig"; path = "Pods/Pods-BiereBeacons.xcconfig"; sourceTree = "<group>"; };
 		F2A5FB779FDF4BB1A795F467 /* libPods-BiereBeacons.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BiereBeacons.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FD090A8904724FEAAF98E618 /* libPods-BiereBeaconsTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BiereBeaconsTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +125,7 @@
 				B666D81A19592E1A0056CC58 /* XCTest.framework in Frameworks */,
 				B666D81C19592E1A0056CC58 /* UIKit.framework in Frameworks */,
 				B666D81B19592E1A0056CC58 /* Foundation.framework in Frameworks */,
+				0773DB1D8D2442B8B311C00E /* libPods-BiereBeaconsTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,6 +152,7 @@
 				B666D7FF19592E190056CC58 /* Frameworks */,
 				B666D7FE19592E190056CC58 /* Products */,
 				BC4BA658967A404FA449126A /* Pods-BiereBeacons.xcconfig */,
+				B8ADF7C9ED20494296DAB7EE /* Pods-BiereBeaconsTests.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -160,6 +176,7 @@
 				B666D80419592E190056CC58 /* UIKit.framework */,
 				B666D81919592E1A0056CC58 /* XCTest.framework */,
 				F2A5FB779FDF4BB1A795F467 /* libPods-BiereBeacons.a */,
+				FD090A8904724FEAAF98E618 /* libPods-BiereBeaconsTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -167,6 +184,7 @@
 		B666D80619592E190056CC58 /* BiereBeacons */ = {
 			isa = PBXGroup;
 			children = (
+				B69CBC2419665FE00091931B /* Managers */,
 				B632E656195AB26B0079B17A /* RegionDefaults.h */,
 				B632E657195AB26B0079B17A /* RegionDefaults.m */,
 				B6F5F5BC195945970076EB03 /* Views */,
@@ -220,6 +238,11 @@
 				B666D82F19592ED10056CC58 /* BadgeViewController.h */,
 				B666D83019592ED10056CC58 /* BadgeViewController.m */,
 				B666D83119592ED10056CC58 /* BadgeViewController.xib */,
+				B69CBC1F19663C560091931B /* UserActionDetailViewController.h */,
+				B69CBC2019663C560091931B /* UserActionDetailViewController.m */,
+				B69CBC2119663C560091931B /* UserActionDetailViewController.xib */,
+				B69CBC28196668D50091931B /* GameViewController.h */,
+				B69CBC29196668D50091931B /* GameViewController.m */,
 			);
 			name = ViewControllers;
 			path = ..;
@@ -228,12 +251,21 @@
 		B666D835195935A40056CC58 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				B632E659195AB2A00079B17A /* CaptureManager.h */,
-				B632E65A195AB2A00079B17A /* CaptureManager.m */,
 				B666D836195935F40056CC58 /* IngredientBadge.h */,
 				B666D837195935F40056CC58 /* IngredientBadge.m */,
 			);
 			name = Models;
+			sourceTree = "<group>";
+		};
+		B69CBC2419665FE00091931B /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				B632E659195AB2A00079B17A /* CaptureManager.h */,
+				B632E65A195AB2A00079B17A /* CaptureManager.m */,
+				B69CBC25196661720091931B /* BeaconManager.h */,
+				B69CBC26196661720091931B /* BeaconManager.m */,
+			);
+			name = Managers;
 			sourceTree = "<group>";
 		};
 		B6F5F5BC195945970076EB03 /* Views */ = {
@@ -272,9 +304,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B666D82C19592E1A0056CC58 /* Build configuration list for PBXNativeTarget "BiereBeaconsTests" */;
 			buildPhases = (
+				395131F10BEA4E38A26A50C7 /* Check Pods Manifest.lock */,
 				B666D81419592E1A0056CC58 /* Sources */,
 				B666D81519592E1A0056CC58 /* Frameworks */,
 				B666D81619592E1A0056CC58 /* Resources */,
+				DB5F1E017A4847B2A69C1AA3 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -334,6 +368,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B69CBC2319663C560091931B /* UserActionDetailViewController.xib in Resources */,
 				B666D80B19592E190056CC58 /* InfoPlist.strings in Resources */,
 				B666D83319592ED10056CC58 /* BadgeViewController.xib in Resources */,
 				B606CA41195BDD4C000A9B75 /* badges.plist in Resources */,
@@ -353,6 +388,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		395131F10BEA4E38A26A50C7 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
 		AD42E24E6FF24FCC8A2EE4AB /* Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -383,6 +433,21 @@
 			shellScript = "\"${SRCROOT}/Pods/Pods-BiereBeacons-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		DB5F1E017A4847B2A69C1AA3 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-BiereBeaconsTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -394,10 +459,13 @@
 				B666D838195935F40056CC58 /* IngredientBadge.m in Sources */,
 				B632E65B195AB2A00079B17A /* CaptureManager.m in Sources */,
 				B666D81119592E190056CC58 /* AppDelegate.m in Sources */,
+				B69CBC2219663C560091931B /* UserActionDetailViewController.m in Sources */,
+				B69CBC2A196668D50091931B /* GameViewController.m in Sources */,
 				B632E654195AB25F0079B17A /* IneligibleDeviceViewController.m in Sources */,
 				B6C770E61960DFC200E83ADF /* UIColor+AppColors.m in Sources */,
 				B654F5D5195D1C3F005AC697 /* CLBeacon+Proximity.m in Sources */,
 				B666D80D19592E190056CC58 /* main.m in Sources */,
+				B69CBC27196661720091931B /* BeaconManager.m in Sources */,
 				B6F5F5BB195945940076EB03 /* BadgeCell.m in Sources */,
 				B666D83219592ED10056CC58 /* BadgeViewController.m in Sources */,
 			);
@@ -518,11 +586,18 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BiereBeacons/BiereBeacons-Prefix.pch";
 				INFOPLIST_FILE = "BiereBeacons/BiereBeacons-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-framework",
+					CoreGraphics,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -534,17 +609,25 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BiereBeacons/BiereBeacons-Prefix.pch";
 				INFOPLIST_FILE = "BiereBeacons/BiereBeacons-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-framework",
+					CoreGraphics,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
 		};
 		B666D82D19592E1A0056CC58 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B8ADF7C9ED20494296DAB7EE /* Pods-BiereBeaconsTests.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/BiereBeacons.app/BiereBeacons";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -567,6 +650,7 @@
 		};
 		B666D82E19592E1A0056CC58 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B8ADF7C9ED20494296DAB7EE /* Pods-BiereBeaconsTests.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/BiereBeacons.app/BiereBeacons";
 				FRAMEWORK_SEARCH_PATHS = (

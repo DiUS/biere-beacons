@@ -1,19 +1,18 @@
 //
-//  IneligibleDeviceViewController.m
+//  UserActionDetailViewController.m
 //  BiereBeacons
 //
-//  Created by Brenton Crowley on 24/06/2014.
+//  Created by Brenton Crowley on 04/07/2014.
 //  Copyright (c) 2014 DiUS. All rights reserved.
 //
 
-#import "IneligibleDeviceViewController.h"
+#import "UserActionDetailViewController.h"
 
-
-@interface IneligibleDeviceViewController ()
+@interface UserActionDetailViewController ()
 
 @end
 
-@implementation IneligibleDeviceViewController
+@implementation UserActionDetailViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -27,8 +26,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    self.view.backgroundColor = [UIColor clearColor];
+    // Do any additional setup after loading the view from its nib.
 }
 
 - (void)didReceiveMemoryWarning

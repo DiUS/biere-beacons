@@ -34,9 +34,7 @@
 {
     if (![CLLocationManager
          isMonitoringAvailableForClass:[CLBeaconRegion class]] ||
-        ![CLLocationManager isRangingAvailable] ||
-        ([CLLocationManager
-          authorizationStatus] == kCLAuthorizationStatusDenied))
+        ![CLLocationManager isRangingAvailable])
     {
         return NO;
     }
@@ -81,18 +79,6 @@
     {
         [self.locationManager startMonitoringForRegion:self.beaconRegion];
     }
-}
-
-#pragma mark - Private
-
-- (id)init
-{
-    if ((self = [super init]))
-    {
-        
-    }
-    
-    return self;
 }
 
 @end
