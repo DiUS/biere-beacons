@@ -49,7 +49,6 @@
      ];
     
     self.textView.text = self.descriptionText;
-    [self.textView sizeToFit];
     self.textView.selectable = NO;
 }
 

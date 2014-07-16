@@ -7,9 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "BadgeConfigViewController.h"
 
 @interface BadgeViewController : UICollectionViewController <
-UICollectionViewDataSource, UICollectionViewDelegate>
+UICollectionViewDataSource, UICollectionViewDelegate, BadgeConfigDelegate>
 
 extern NSString *kBoundaryNotificationBody;
 

@@ -7,48 +7,29 @@
 //
 
 #import "CaptureManager.h"
-#import "IngredientBadge.h"
-#import <CoreLocation/CoreLocation.h>
 #import "RegionDefaults.h"
-#import <MBProgressHUD.h>
-#import "CLBeacon+Proximity.h"
+#import "BeaconManager.h"
+#import "DeployedBeacon+Badge.h"
 
 @interface CaptureManager()
 
 @property (nonatomic) NSMutableArray *loggedBeacons;
-@property (nonatomic) NSDictionary *badges;
-@property (nonatomic) IngredientBadge *activeBadge;
+@property (nonatomic) DeployedBeacon *activeBadge;
 
 @end
 
 @implementation CaptureManager
 
-- (id)initWithBadges:(NSArray *)badges
-{
-    if ((self = [super init]))
-    {
-        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-
-        for (IngredientBadge *badge in badges)
-        {
-            NSString *key = [self keyForUUID:badge.uuid
-                                       major:badge.major
-                                       minor:badge.minor
-                             ];
-
-            dict[key] = badge;
-        }
-        
-        _badges = dict;
-    }
-    
-    return self;
-}
-
 - (void)logRangedBeacons:(NSArray *)beacons
 {
     CLBeacon *closestBeacon = [beacons firstObject];
-    IngredientBadge *rangedBadge = [self badgeForBeacon:closestBeacon];
+    NSString *key = [BeaconManager keyForUUID:closestBeacon.proximityUUID.UUIDString
+                                        major:closestBeacon.major.integerValue
+                                        minor:closestBeacon.minor.integerValue
+                     ];
+    
+    DeployedBeacon *rangedBadge = [BeaconManager
+                                   deployedBeaconForKey:key];
     
     // if ranged badge is found ignore updates
     
@@ -63,30 +44,32 @@
     if (!beacons.count)
         return;
     
-    if (closestBeacon)
+    if (closestBeacon && [self isValidSpottedProximityForBeacon:closestBeacon])
     {
         self.activeBadge = rangedBadge;
         
-        if (!self.activeBadge.isFound)
+        if (![self.activeBadge isFound])
         {
             switch (self.activeBadge.findStatus)
             {
                 case FindStatusUnknown:
                     
+                    self.activeBadge.rssiWhenSpotted = closestBeacon.rssi;
+                    self.activeBadge.accuracyWhenSpotted = closestBeacon.accuracy;
                     self.activeBadge.findStatus = FindStatusSpotted;
                     
                     break;
                     
                 case FindStatusGatherReady:
-                    
-                    if ([closestBeacon isBeaconImmediate])
+                {
+                    if ([self isValidGatherProximityForBeacon:closestBeacon])
                         self.activeBadge.findStatus = FindStatusGathering;
                     
                     break;
-                    
+                }
                 case FindStatusGathering:
                     
-                    if ([closestBeacon isBeaconImmediate])
+                    if ([self isValidGatherProximityForBeacon:closestBeacon])
                         [self.activeBadge updateLogCount];
                     
                     break;
@@ -98,27 +81,40 @@
     }
 }
 
-- (IngredientBadge *)badgeForBeacon:(CLBeacon *)beacon
+- (BOOL)isValidGatherProximityForBeacon:(CLBeacon *)beacon
 {
+    NSString *key = [BeaconManager keyForUUID:beacon.proximityUUID.UUIDString
+                                        major:beacon.major.integerValue
+                                        minor:beacon.minor.integerValue];
     
-    NSString *key = [self keyForUUID:beacon.proximityUUID.UUIDString
-                               major:beacon.major.integerValue
-                               minor:beacon.minor.integerValue
-                     ];
+    DeployedBeacon *deployedBeacon = [BeaconManager deployedBeaconForKey:key];
     
-    return self.badges[key];
+    if (deployedBeacon.primaryProximity == CLProximityUnknown)
+        return YES;
+    
+    if (beacon.proximity != CLProximityUnknown &&
+        beacon.proximity <= deployedBeacon.primaryProximity)
+        return YES;
+    
+    return NO;
 }
 
-- (NSString *)keyForUUID:(NSString *)uuid
-                   major:(NSInteger)major
-                   minor:(NSInteger)minor
+- (BOOL)isValidSpottedProximityForBeacon:(CLBeacon *)beacon
 {
-    NSString *key = [NSString stringWithFormat:@"%@%ld%ld",
-                     uuid,
-                     (long)major,
-                     (long)minor];
+    NSString *key = [BeaconManager keyForUUID:beacon.proximityUUID.UUIDString
+                                        major:beacon.major.integerValue
+                                        minor:beacon.minor.integerValue];
     
-    return key;
+    DeployedBeacon *deployedBeacon = [BeaconManager deployedBeaconForKey:key];
+    
+    if (deployedBeacon.secondaryProximity == CLProximityUnknown)
+        return YES;
+    
+    if (beacon.proximity != CLProximityUnknown &&
+        beacon.proximity <= deployedBeacon.secondaryProximity)
+        return YES;
+    
+    return NO;
 }
 
 @end

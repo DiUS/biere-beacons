@@ -7,10 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DeployedBeacon.h"
 
 @interface CaptureManager : NSObject
 
-- (id)initWithBadges:(NSArray *)badges;
 - (void)logRangedBeacons:(NSArray *)beacons;
 
 @end

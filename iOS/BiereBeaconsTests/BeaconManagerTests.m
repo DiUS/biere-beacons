@@ -2,7 +2,7 @@
 //  BeaconManagerTests.m
 //  BiereBeacons
 //
-//  Created by Brenton Crowley on 03/07/2014.
+//  Created by Brenton Crowley on 09/07/2014.
 //  Copyright (c) 2014 DiUS. All rights reserved.
 //
 
@@ -11,7 +11,7 @@
 
 @interface BeaconManagerTests : XCTestCase
 
-@property (nonatomic) BeaconManager *beaconManager;
+@property (nonatomic) BeaconManager *manager;
 
 @end
 
@@ -20,22 +20,31 @@
 - (void)setUp
 {
     [super setUp];
-    
-    self.beaconManager = [BeaconManager sharedInstance];
+    self.manager = [BeaconManager sharedInstance];
 }
 
 - (void)tearDown
 {
-    self.beaconManager = nil;
-    
+    self.manager = nil;
     [super tearDown];
 }
 
-- (void)testExample
+- (void)testDeployedBeaconsFromFile
 {
-    [BeaconManager requestAuthorisation];
+    NSArray *beacons = [BeaconManager deployedBeacons];
     
-    NSAssert(YES, @"Should be YES, but no");
+    XCTAssertNotNil(beacons, @"Beacons are nil when they shouldn't be.");
+}
+
+- (void)testFilterBadgesFromDeployedBeacons
+{
+    NSArray *beacons = [BeaconManager deployedBeacons];
+    NSArray *badges = nil;
+    NSPredicate *badgePredicate = [NSPredicate predicateWithFormat:@"type = 'badge'"];
+    
+    badges = [beacons filteredArrayUsingPredicate:badgePredicate];
+    
+    XCTAssertTrue(badges.count == 4, @"Badge count should be 4, but is not.");
 }
 
 @end

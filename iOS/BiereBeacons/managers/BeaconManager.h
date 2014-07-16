@@ -7,6 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DeployedBeacon.h"
+#import <CoreLocation/CoreLocation.h>
 
 @interface BeaconManager : NSObject
 
@@ -14,8 +16,14 @@ extern NSString *kTemplate;
 extern NSString *kLocationAuthorisationChange;
 
 + (id)sharedInstance;
++ (NSArray *)deployedBeacons;
 + (BOOL)isBeaconReady;
 + (BOOL)isLocationAware;
 + (void)requestAuthorisation;
++ (void)writeBeaconsToFile;
++ (DeployedBeacon *)deployedBeaconForKey:(NSString *)key;
++ (NSString *)keyForUUID:(NSString *)uuid
+                   major:(NSInteger)major
+                   minor:(NSInteger)minor;
 
 @end

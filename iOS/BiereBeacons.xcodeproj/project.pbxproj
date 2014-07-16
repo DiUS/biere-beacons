@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		0773DB1D8D2442B8B311C00E /* libPods-BiereBeaconsTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD090A8904724FEAAF98E618 /* libPods-BiereBeaconsTests.a */; };
 		2E4B93FEAD3E456181A8A3D9 /* libPods-BiereBeacons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2A5FB779FDF4BB1A795F467 /* libPods-BiereBeacons.a */; };
-		B606CA41195BDD4C000A9B75 /* badges.plist in Resources */ = {isa = PBXBuildFile; fileRef = B606CA40195BDD4C000A9B75 /* badges.plist */; };
+		B606CA41195BDD4C000A9B75 /* beacons.plist in Resources */ = {isa = PBXBuildFile; fileRef = B606CA40195BDD4C000A9B75 /* beacons.plist */; };
 		B632E654195AB25F0079B17A /* IneligibleDeviceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B632E652195AB25F0079B17A /* IneligibleDeviceViewController.m */; };
 		B632E655195AB25F0079B17A /* IneligibleDeviceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B632E653195AB25F0079B17A /* IneligibleDeviceViewController.xib */; };
 		B632E658195AB26B0079B17A /* RegionDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = B632E657195AB26B0079B17A /* RegionDefaults.m */; };
@@ -17,7 +17,7 @@
 		B654F5CD195CDC79005AC697 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B654F5CC195CDC79005AC697 /* CoreBluetooth.framework */; };
 		B654F5CF195CDC80005AC697 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B654F5CE195CDC80005AC697 /* CoreLocation.framework */; };
 		B654F5D1195D0A96005AC697 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B654F5D0195D0A96005AC697 /* AudioToolbox.framework */; };
-		B654F5D5195D1C3F005AC697 /* CLBeacon+Proximity.m in Sources */ = {isa = PBXBuildFile; fileRef = B654F5D4195D1C3F005AC697 /* CLBeacon+Proximity.m */; };
+		B6655C84196E2AFD00478262 /* DeployedBeacon+Badge.m in Sources */ = {isa = PBXBuildFile; fileRef = B6655C83196E2AFD00478262 /* DeployedBeacon+Badge.m */; };
 		B666D80119592E190056CC58 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B666D80019592E190056CC58 /* Foundation.framework */; };
 		B666D80319592E190056CC58 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B666D80219592E190056CC58 /* CoreGraphics.framework */; };
 		B666D80519592E190056CC58 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B666D80419592E190056CC58 /* UIKit.framework */; };
@@ -29,14 +29,18 @@
 		B666D81B19592E1A0056CC58 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B666D80019592E190056CC58 /* Foundation.framework */; };
 		B666D81C19592E1A0056CC58 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B666D80419592E190056CC58 /* UIKit.framework */; };
 		B666D82419592E1A0056CC58 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B666D82219592E1A0056CC58 /* InfoPlist.strings */; };
-		B666D82619592E1A0056CC58 /* BiereBeaconsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B666D82519592E1A0056CC58 /* BiereBeaconsTests.m */; };
 		B666D83219592ED10056CC58 /* BadgeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B666D83019592ED10056CC58 /* BadgeViewController.m */; };
 		B666D83319592ED10056CC58 /* BadgeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B666D83119592ED10056CC58 /* BadgeViewController.xib */; };
-		B666D838195935F40056CC58 /* IngredientBadge.m in Sources */ = {isa = PBXBuildFile; fileRef = B666D837195935F40056CC58 /* IngredientBadge.m */; };
+		B699269F19760B3E006B24AC /* BadgeConfigViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B699269D19760B3E006B24AC /* BadgeConfigViewController.m */; };
+		B69926A019760B3E006B24AC /* BadgeConfigViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B699269E19760B3E006B24AC /* BadgeConfigViewController.xib */; };
 		B69CBC2219663C560091931B /* UserActionDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B69CBC2019663C560091931B /* UserActionDetailViewController.m */; };
 		B69CBC2319663C560091931B /* UserActionDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B69CBC2119663C560091931B /* UserActionDetailViewController.xib */; };
 		B69CBC27196661720091931B /* BeaconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B69CBC26196661720091931B /* BeaconManager.m */; };
 		B69CBC2A196668D50091931B /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B69CBC29196668D50091931B /* GameViewController.m */; };
+		B6A3039B19736A800095C9AB /* DeployedBeaconTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B6A3039A19736A800095C9AB /* DeployedBeaconTests.m */; };
+		B6A61082196E67920091C87D /* GatherProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = B6A61081196E67920091C87D /* GatherProgressView.m */; };
+		B6B11CD4196CC40200491862 /* DeployedBeacon.m in Sources */ = {isa = PBXBuildFile; fileRef = B6B11CD3196CC40200491862 /* DeployedBeacon.m */; };
+		B6B11CD6196CD11B00491862 /* BeaconManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B6B11CD5196CD11B00491862 /* BeaconManagerTests.m */; };
 		B6C770E61960DFC200E83ADF /* UIColor+AppColors.m in Sources */ = {isa = PBXBuildFile; fileRef = B6C770E51960DFC200E83ADF /* UIColor+AppColors.m */; };
 		B6F5F5BB195945940076EB03 /* BadgeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F5F5BA195945940076EB03 /* BadgeCell.m */; };
 /* End PBXBuildFile section */
@@ -52,7 +56,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		B606CA40195BDD4C000A9B75 /* badges.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = badges.plist; sourceTree = "<group>"; };
+		B606CA40195BDD4C000A9B75 /* beacons.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = beacons.plist; sourceTree = "<group>"; };
 		B632E651195AB25F0079B17A /* IneligibleDeviceViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IneligibleDeviceViewController.h; path = BiereBeacons/viewControllers/IneligibleDeviceViewController.h; sourceTree = "<group>"; };
 		B632E652195AB25F0079B17A /* IneligibleDeviceViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IneligibleDeviceViewController.m; path = BiereBeacons/viewControllers/IneligibleDeviceViewController.m; sourceTree = "<group>"; };
 		B632E653195AB25F0079B17A /* IneligibleDeviceViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = IneligibleDeviceViewController.xib; path = BiereBeacons/viewControllers/IneligibleDeviceViewController.xib; sourceTree = "<group>"; };
@@ -63,8 +67,8 @@
 		B654F5CC195CDC79005AC697 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		B654F5CE195CDC80005AC697 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		B654F5D0195D0A96005AC697 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		B654F5D3195D1C3F005AC697 /* CLBeacon+Proximity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CLBeacon+Proximity.h"; path = "Categories/CLBeacon+Proximity.h"; sourceTree = "<group>"; };
-		B654F5D4195D1C3F005AC697 /* CLBeacon+Proximity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "CLBeacon+Proximity.m"; path = "Categories/CLBeacon+Proximity.m"; sourceTree = "<group>"; };
+		B6655C82196E2AFD00478262 /* DeployedBeacon+Badge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "DeployedBeacon+Badge.h"; sourceTree = "<group>"; };
+		B6655C83196E2AFD00478262 /* DeployedBeacon+Badge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "DeployedBeacon+Badge.m"; sourceTree = "<group>"; };
 		B666D7FD19592E190056CC58 /* BiereBeacons.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BiereBeacons.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B666D80019592E190056CC58 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		B666D80219592E190056CC58 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -80,12 +84,12 @@
 		B666D81919592E1A0056CC58 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		B666D82119592E1A0056CC58 /* BiereBeaconsTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BiereBeaconsTests-Info.plist"; sourceTree = "<group>"; };
 		B666D82319592E1A0056CC58 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		B666D82519592E1A0056CC58 /* BiereBeaconsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BiereBeaconsTests.m; sourceTree = "<group>"; };
 		B666D82F19592ED10056CC58 /* BadgeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BadgeViewController.h; path = BiereBeacons/viewControllers/BadgeViewController.h; sourceTree = "<group>"; };
 		B666D83019592ED10056CC58 /* BadgeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BadgeViewController.m; path = BiereBeacons/viewControllers/BadgeViewController.m; sourceTree = "<group>"; };
 		B666D83119592ED10056CC58 /* BadgeViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = BadgeViewController.xib; path = BiereBeacons/viewControllers/BadgeViewController.xib; sourceTree = "<group>"; };
-		B666D836195935F40056CC58 /* IngredientBadge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IngredientBadge.h; path = BiereBeacons/models/IngredientBadge.h; sourceTree = SOURCE_ROOT; };
-		B666D837195935F40056CC58 /* IngredientBadge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IngredientBadge.m; path = BiereBeacons/models/IngredientBadge.m; sourceTree = SOURCE_ROOT; };
+		B699269C19760B3E006B24AC /* BadgeConfigViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BadgeConfigViewController.h; path = BiereBeacons/viewControllers/BadgeConfigViewController.h; sourceTree = "<group>"; };
+		B699269D19760B3E006B24AC /* BadgeConfigViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BadgeConfigViewController.m; path = BiereBeacons/viewControllers/BadgeConfigViewController.m; sourceTree = "<group>"; };
+		B699269E19760B3E006B24AC /* BadgeConfigViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = BadgeConfigViewController.xib; path = BiereBeacons/viewControllers/BadgeConfigViewController.xib; sourceTree = "<group>"; };
 		B69CBC1F19663C560091931B /* UserActionDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UserActionDetailViewController.h; path = BiereBeacons/viewControllers/UserActionDetailViewController.h; sourceTree = "<group>"; };
 		B69CBC2019663C560091931B /* UserActionDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UserActionDetailViewController.m; path = BiereBeacons/viewControllers/UserActionDetailViewController.m; sourceTree = "<group>"; };
 		B69CBC2119663C560091931B /* UserActionDetailViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = UserActionDetailViewController.xib; path = BiereBeacons/viewControllers/UserActionDetailViewController.xib; sourceTree = "<group>"; };
@@ -93,6 +97,12 @@
 		B69CBC26196661720091931B /* BeaconManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BeaconManager.m; path = managers/BeaconManager.m; sourceTree = "<group>"; };
 		B69CBC28196668D50091931B /* GameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameViewController.h; path = BiereBeacons/viewControllers/GameViewController.h; sourceTree = "<group>"; };
 		B69CBC29196668D50091931B /* GameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GameViewController.m; path = BiereBeacons/viewControllers/GameViewController.m; sourceTree = "<group>"; };
+		B6A3039A19736A800095C9AB /* DeployedBeaconTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeployedBeaconTests.m; sourceTree = "<group>"; };
+		B6A61080196E67920091C87D /* GatherProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GatherProgressView.h; path = BiereBeacons/Views/GatherProgressView.h; sourceTree = "<group>"; };
+		B6A61081196E67920091C87D /* GatherProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GatherProgressView.m; path = BiereBeacons/Views/GatherProgressView.m; sourceTree = "<group>"; };
+		B6B11CD2196CC40200491862 /* DeployedBeacon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeployedBeacon.h; sourceTree = "<group>"; };
+		B6B11CD3196CC40200491862 /* DeployedBeacon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeployedBeacon.m; sourceTree = "<group>"; };
+		B6B11CD5196CD11B00491862 /* BeaconManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BeaconManagerTests.m; sourceTree = "<group>"; };
 		B6C770E41960DFC200E83ADF /* UIColor+AppColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor+AppColors.h"; path = "BiereBeacons/UIColor+AppColors.h"; sourceTree = "<group>"; };
 		B6C770E51960DFC200E83ADF /* UIColor+AppColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIColor+AppColors.m"; path = "BiereBeacons/UIColor+AppColors.m"; sourceTree = "<group>"; };
 		B6F5F5B9195945940076EB03 /* BadgeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BadgeCell.h; path = BiereBeacons/Views/BadgeCell.h; sourceTree = "<group>"; };
@@ -137,8 +147,6 @@
 			children = (
 				B6C770E41960DFC200E83ADF /* UIColor+AppColors.h */,
 				B6C770E51960DFC200E83ADF /* UIColor+AppColors.m */,
-				B654F5D3195D1C3F005AC697 /* CLBeacon+Proximity.h */,
-				B654F5D4195D1C3F005AC697 /* CLBeacon+Proximity.m */,
 			);
 			name = Categories;
 			path = ..;
@@ -202,7 +210,7 @@
 			isa = PBXGroup;
 			children = (
 				B654F5D2195D1BF6005AC697 /* Categories */,
-				B606CA40195BDD4C000A9B75 /* badges.plist */,
+				B606CA40195BDD4C000A9B75 /* beacons.plist */,
 				B666D80819592E190056CC58 /* BiereBeacons-Info.plist */,
 				B666D80919592E190056CC58 /* InfoPlist.strings */,
 				B666D80C19592E190056CC58 /* main.m */,
@@ -214,8 +222,9 @@
 		B666D81F19592E1A0056CC58 /* BiereBeaconsTests */ = {
 			isa = PBXGroup;
 			children = (
-				B666D82519592E1A0056CC58 /* BiereBeaconsTests.m */,
+				B6B11CD5196CD11B00491862 /* BeaconManagerTests.m */,
 				B666D82019592E1A0056CC58 /* Supporting Files */,
+				B6A3039A19736A800095C9AB /* DeployedBeaconTests.m */,
 			);
 			path = BiereBeaconsTests;
 			sourceTree = "<group>";
@@ -233,6 +242,9 @@
 			isa = PBXGroup;
 			children = (
 				B632E651195AB25F0079B17A /* IneligibleDeviceViewController.h */,
+				B699269C19760B3E006B24AC /* BadgeConfigViewController.h */,
+				B699269D19760B3E006B24AC /* BadgeConfigViewController.m */,
+				B699269E19760B3E006B24AC /* BadgeConfigViewController.xib */,
 				B632E652195AB25F0079B17A /* IneligibleDeviceViewController.m */,
 				B632E653195AB25F0079B17A /* IneligibleDeviceViewController.xib */,
 				B666D82F19592ED10056CC58 /* BadgeViewController.h */,
@@ -251,8 +263,10 @@
 		B666D835195935A40056CC58 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				B666D836195935F40056CC58 /* IngredientBadge.h */,
-				B666D837195935F40056CC58 /* IngredientBadge.m */,
+				B6B11CD2196CC40200491862 /* DeployedBeacon.h */,
+				B6B11CD3196CC40200491862 /* DeployedBeacon.m */,
+				B6655C82196E2AFD00478262 /* DeployedBeacon+Badge.h */,
+				B6655C83196E2AFD00478262 /* DeployedBeacon+Badge.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -273,6 +287,8 @@
 			children = (
 				B6F5F5B9195945940076EB03 /* BadgeCell.h */,
 				B6F5F5BA195945940076EB03 /* BadgeCell.m */,
+				B6A61080196E67920091C87D /* GatherProgressView.h */,
+				B6A61081196E67920091C87D /* GatherProgressView.m */,
 			);
 			name = Views;
 			path = ..;
@@ -371,7 +387,8 @@
 				B69CBC2319663C560091931B /* UserActionDetailViewController.xib in Resources */,
 				B666D80B19592E190056CC58 /* InfoPlist.strings in Resources */,
 				B666D83319592ED10056CC58 /* BadgeViewController.xib in Resources */,
-				B606CA41195BDD4C000A9B75 /* badges.plist in Resources */,
+				B69926A019760B3E006B24AC /* BadgeConfigViewController.xib in Resources */,
+				B606CA41195BDD4C000A9B75 /* beacons.plist in Resources */,
 				B632E655195AB25F0079B17A /* IneligibleDeviceViewController.xib in Resources */,
 				B666D81319592E190056CC58 /* Images.xcassets in Resources */,
 			);
@@ -456,18 +473,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				B632E658195AB26B0079B17A /* RegionDefaults.m in Sources */,
-				B666D838195935F40056CC58 /* IngredientBadge.m in Sources */,
 				B632E65B195AB2A00079B17A /* CaptureManager.m in Sources */,
+				B6B11CD4196CC40200491862 /* DeployedBeacon.m in Sources */,
 				B666D81119592E190056CC58 /* AppDelegate.m in Sources */,
 				B69CBC2219663C560091931B /* UserActionDetailViewController.m in Sources */,
+				B699269F19760B3E006B24AC /* BadgeConfigViewController.m in Sources */,
 				B69CBC2A196668D50091931B /* GameViewController.m in Sources */,
 				B632E654195AB25F0079B17A /* IneligibleDeviceViewController.m in Sources */,
 				B6C770E61960DFC200E83ADF /* UIColor+AppColors.m in Sources */,
-				B654F5D5195D1C3F005AC697 /* CLBeacon+Proximity.m in Sources */,
 				B666D80D19592E190056CC58 /* main.m in Sources */,
 				B69CBC27196661720091931B /* BeaconManager.m in Sources */,
 				B6F5F5BB195945940076EB03 /* BadgeCell.m in Sources */,
+				B6A61082196E67920091C87D /* GatherProgressView.m in Sources */,
 				B666D83219592ED10056CC58 /* BadgeViewController.m in Sources */,
+				B6655C84196E2AFD00478262 /* DeployedBeacon+Badge.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -475,7 +494,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B666D82619592E1A0056CC58 /* BiereBeaconsTests.m in Sources */,
+				B6B11CD6196CD11B00491862 /* BeaconManagerTests.m in Sources */,
+				B6A3039B19736A800095C9AB /* DeployedBeaconTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -642,6 +662,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "BiereBeaconsTests/BiereBeaconsTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -661,6 +682,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BiereBeacons/BiereBeacons-Prefix.pch";
 				INFOPLIST_FILE = "BiereBeaconsTests/BiereBeaconsTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;

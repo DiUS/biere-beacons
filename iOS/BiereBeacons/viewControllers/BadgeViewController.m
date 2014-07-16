@@ -7,7 +7,6 @@
 //
 
 #import "BadgeViewController.h"
-#import "IngredientBadge.h"
 #import "BadgeCell.h"
 #import "RegionDefaults.h"
 #import <CoreLocation/CoreLocation.h>
@@ -16,20 +15,25 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <AudioToolbox/AudioServices.h>
 #import "UIColor+AppColors.h"
+#import "BeaconManager.h"
+#import "DeployedBeacon+Badge.h"
+#import "GatherProgressView.h"
 
 @interface BadgeViewController () <CLLocationManagerDelegate,
-IngredientBadgeDelegate, UIActionSheetDelegate, MBProgressHUDDelegate,
+DeployedBeaconDelegate, UIActionSheetDelegate, MBProgressHUDDelegate,
 CBCentralManagerDelegate>
 
-@property (nonatomic) NSArray *badges;
+@property (nonatomic) NSArray *deployedBeacons;
 @property (nonatomic) NSArray *rangedBeacons;
 @property (nonatomic) CLLocationManager *locationManager;
 @property (nonatomic) RegionDefaults *regionDefaults;
 @property (nonatomic) CaptureManager *captureManager;
-@property (nonatomic) IngredientBadge *focussedBadge;
+@property (nonatomic) DeployedBeacon *focussedBadge;
 @property (nonatomic) MBProgressHUD *hud;
 @property (nonatomic) UIImageView *gameStatusImageView;
 @property (nonatomic) NSTimer *gameThread;
+@property (nonatomic) BOOL debug;
+@property (nonatomic) UIImageView *debugImageView;
 
 @end
 
@@ -53,9 +57,9 @@ static float kInset = 8.0f;
     
     if ((self = [super initWithCollectionViewLayout:layout]))
     {
-        _badges = badges;
+        _deployedBeacons = badges;
         
-        for (IngredientBadge *badge in _badges)
+        for (DeployedBeacon *badge in _deployedBeacons)
             badge.delegate = self;
     }
     
@@ -73,14 +77,18 @@ static float kInset = 8.0f;
                                  style:UIBarButtonItemStyleBordered
                                  target:self
                                  action:@selector(showGameInstructions)];
-    [infoItem setTitleTextAttributes:@{
-                   NSForegroundColorAttributeName : [UIColor appPaleYellow]}
-                            forState:UIControlStateNormal];
     
     self.navigationItem.rightBarButtonItem = infoItem;
     
-    self.captureManager = [[CaptureManager alloc]
-                           initWithBadges:self.badges];
+    UIBarButtonItem *debugItem = [[UIBarButtonItem alloc]
+                                 initWithTitle:@"debug"
+                                 style:UIBarButtonItemStyleBordered
+                                 target:self
+                                 action:@selector(toggleDebug)];
+    
+//    self.navigationItem.leftBarButtonItem = debugItem;
+    
+    self.captureManager = [[CaptureManager alloc] init];
     
     [self.collectionView registerClass:[BadgeCell class]
             forCellWithReuseIdentifier:kBadgeCellID];
@@ -88,8 +96,6 @@ static float kInset = 8.0f;
     self.collectionView.backgroundColor = [UIColor appPaleYellow];
     
     self.regionDefaults = [RegionDefaults sharedInstance];
-    
-    
     
     NSNotificationCenter *nCenter = [NSNotificationCenter defaultCenter];
     
@@ -120,6 +126,8 @@ static float kInset = 8.0f;
     }
     
     [self validateBluetoothStatus];
+    
+    self.debug = NO;
     
 }
 
@@ -164,14 +172,14 @@ static float kInset = 8.0f;
 
 - (void)refreshBadges
 {
-    [IngredientBadge writeBadges];
+    [BeaconManager writeBeaconsToFile];
     [self.collectionView reloadData];
 }
 
 - (NSArray *)foundBadges
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"isFound = YES"];
-    return [self.badges filteredArrayUsingPredicate:predicate];
+    return [self.deployedBeacons filteredArrayUsingPredicate:predicate];
 }
 
 - (UIImageView *)gameStatusImageView
@@ -187,32 +195,54 @@ static float kInset = 8.0f;
     return _gameStatusImageView;
 }
 
-- (NSString *)gameBeaconUUID
-{
-    return [[[RegionDefaults sharedInstance] regionUUID] UUIDString];
-}
-
-- (NSInteger)gameMajor
-{
-    return 0;
-}
-
-- (NSInteger)gameMinor
-{
-    return 0;
-}
-
-- (NSPredicate *)gameBeaconPredicate
-{
-    return [NSPredicate predicateWithFormat:@"major = %ld AND minor = %ld",
-            [self gameMajor],
-            [self gameMinor]
-            ];
-}
-
 - (BOOL)isGameOver
 {
-    return [self foundBadges].count == self.badges.count;
+    return [self foundBadges].count == self.deployedBeacons.count;
+}
+
+- (UIImageView *)debugImageView
+{
+    if (!_debugImageView)
+    {
+        NSInteger width = 50;
+        NSInteger height = width;
+        NSInteger x = 0;
+        NSInteger y = self.view.frame.size.height - height;
+        
+        _debugImageView = [[UIImageView alloc]
+                           initWithFrame:CGRectMake(x,y,width,height)
+                           ];
+        _debugImageView.contentMode = UIViewContentModeScaleAspectFit;
+        _debugImageView.hidden = !self.debug;
+        [self.view addSubview:_debugImageView];
+    }
+    
+    return _debugImageView;
+}
+
+- (void)setDebug:(BOOL)debug
+{
+    _debug = debug;
+    
+    self.debugImageView.hidden = !self.debug;
+    [self.navigationItem.leftBarButtonItem setTitle:[NSString stringWithFormat:@"Debug:%@", _debug ? @"Y" : @"N"]];
+}
+
+#pragma mark - TargetActions
+
+- (void)toggleDebug
+{
+    self.debug = !self.debug;
+}
+
+- (void)validateBluetoothStatus
+{
+    CBCentralManager *bluetoothManager = [[CBCentralManager alloc]
+                                          initWithDelegate:self
+                                          queue:dispatch_get_main_queue()];
+    
+    DLog(@"Bluetooth State: %ld", (unsigned long)bluetoothManager.state);
+    [self centralManagerDidUpdateState:bluetoothManager];
 }
 
 - (void)showGameInstructions
@@ -226,14 +256,9 @@ static float kInset = 8.0f;
                       otherButtonTitles:nil] show];
 }
 
-- (void)validateBluetoothStatus
+- (void)editSettings
 {
-    CBCentralManager *bluetoothManager = [[CBCentralManager alloc]
-                                          initWithDelegate:self
-                                          queue:dispatch_get_main_queue()];
-    
-    DLog(@"Bluetooth State: %ld", (unsigned long)bluetoothManager.state);
-    [self centralManagerDidUpdateState:bluetoothManager];
+
 }
 
 #pragma mark Notification Callbacks
@@ -256,19 +281,12 @@ static float kInset = 8.0f;
         [self.locationManager
          startMonitoringForRegion:[self.regionDefaults beaconRegion]];
         
-        [self.locationManager requestStateForRegion:
-         [self.regionDefaults beaconRegion]];
         DLog(@"Entered Foreground");
         [self.locationManager requestStateForRegion:
          [self.regionDefaults beaconRegion]
          ];
         [self startGameThread];
     }
-//    else if ([notification.name isEqualToString:kBoundaryNotificationBody])
-//    {
-//        if ([[self foundBadges] count] == 0)
-//            [self showGameInstructions];
-//    }
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -301,16 +319,21 @@ static float kInset = 8.0f;
         
     }
     
-    IngredientBadge *badge = [self foundBadges][indexPath.row];
+    DeployedBeacon *badge = [self foundBadges][indexPath.row];
     
     NSString *imageName = nil;
     
-    if (badge.isFound)
-        imageName = [badge.imageURL lowercaseString];
+    if ([badge isFound])
+    {
+        imageName = [badge.name lowercaseString];
+        cell.badgeView.image = [UIImage imageNamed:imageName];
+        cell.badgeView.hidden = NO;
+    }
     else
-        imageName = kLockedBadgedImageName;
-    
-    cell.badgeView.image = [UIImage imageNamed:imageName];
+    {
+        cell.badgeView.image = nil;
+        cell.badgeView.hidden = YES;
+    }
     
     return cell;
 }
@@ -325,8 +348,8 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
                                   initWithTitle:nil
                                   delegate:self
                                   cancelButtonTitle:@"Cancel"
-                                  destructiveButtonTitle:@"Reset"
-                                  otherButtonTitles: nil];
+                                  destructiveButtonTitle:@"Reset found to 'no'"
+                                  otherButtonTitles: @"Edit settings", nil];
 
     [actionSheet showInView:self.navigationController.view];
     
@@ -339,13 +362,44 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     
-    if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Reset"])
+    if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Reset found to 'no'"])
     {
-        self.focussedBadge.isFound = NO;
+        [self.focussedBadge setIsFound:NO];
         [self refreshBadges];
+    }
+    else if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Edit settings"])
+    {
+        [self stopGameThread];
+        
+        BadgeConfigViewController *vc = [[BadgeConfigViewController alloc]
+                                         init];
+        vc.beacon = self.focussedBadge;
+        vc.delegate = self;
+        UINavigationController *navVC = [[UINavigationController alloc]
+                                         initWithRootViewController:vc];
+        [self.navigationController presentViewController:navVC
+                                                animated:YES
+                                              completion:nil];
     }
     
     self.focussedBadge = nil;
+}
+
+#pragma mark - BadgeConfigDelegate
+
+- (void)badgeConfigVCDidUpdate:(BadgeConfigViewController *)vc
+                        beacon:(DeployedBeacon *)beacon
+{
+    if (beacon)
+    {
+        [BeaconManager writeBeaconsToFile];
+        [self refreshBadges];
+    }
+    
+    [self.navigationController dismissViewControllerAnimated:YES
+                                                  completion:nil];
+    
+    [self startGameThread];
 }
 
 #pragma mark - CBCentralManagerDelegate
@@ -353,7 +407,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central
 {
     
-    DLog(@"State: %ld", central.state);
+    DLog(@"State: %ld", (long)central.state);
     
     switch (central.state) {
         case CBCentralManagerStatePoweredOn:
@@ -464,9 +518,35 @@ didStartMonitoringForRegion:(CLRegion *)region
                inRegion:(CLBeaconRegion *)region
 {
     
-    self.rangedBeacons = beacons;
+    NSSortDescriptor *proximity = [[NSSortDescriptor alloc]
+                                   initWithKey:@"proximity"
+                                   ascending:YES
+                                   comparator:^NSComparisonResult(NSNumber *prox1, NSNumber *prox2) {
+                                       
+                                       if ([prox1 integerValue] == 0)
+                                           return (NSComparisonResult)NSOrderedDescending;
+                                       
+                                       return (NSComparisonResult)[prox1 compare:prox2];
+                                   }];
     
-    DLog(@"did range beacons. %ld", (unsigned long)beacons.count);
+    NSSortDescriptor *accuracy = [[NSSortDescriptor alloc ]
+                                  initWithKey:@"accuracy"
+                                  ascending:YES
+                                  comparator:^NSComparisonResult(NSNumber *acc1, NSNumber *acc2) {
+                                      
+                                      if ([acc1 doubleValue] < 0)
+                                          return (NSComparisonResult)NSOrderedDescending;
+                                      
+                                      return (NSComparisonResult)[acc1 compare:acc2];
+                                  }];
+    
+    self.rangedBeacons = [beacons sortedArrayUsingDescriptors:@[
+                                                                proximity,
+                                                                accuracy
+                                                                ]
+                          ];
+    
+//    DLog(@"did range beacons. %ld", (unsigned long)beacons.count);
 }
 
 - (void)locationManager:(CLLocationManager *)manager
@@ -477,15 +557,15 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
     [self validateBluetoothStatus];
 }
 
-#pragma mark - IngredientBadgeDelegate
+#pragma mark - DeployedBeaconDelegate
 
-- (void)ingredientBadgeDidSpotBadge:(IngredientBadge *)badge
+- (void)deployedBeaconDidSpotBadge:(DeployedBeacon *)beacon
 {
     DLog(@"Did Spot Badge");
     [self hideCurrentHUD];
     
-    self.hud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
-	[self.navigationController.view addSubview:self.hud];
+    self.hud = [[MBProgressHUD alloc] initWithView:self.view];
+	[self.view addSubview:self.hud];
     
     // Recommended icon size for progress hud.
     UIImageView *customView = [[UIImageView alloc]
@@ -497,7 +577,12 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
     customView.contentMode = UIViewContentModeScaleAspectFit;
     customView.image = [UIImage imageNamed:kLockedBadgedImageName];
     
-    self.hud.customView = customView;
+    self.hud.customView = [[GatherProgressView alloc]
+                           initWithFrame:CGRectMake(0.0,
+                                                    0.0,
+                                                    100.0,
+                                                    140.0)
+                           ];
     
 	// Set custom view mode
 	self.hud.mode = MBProgressHUDModeCustomView;
@@ -507,25 +592,24 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
     self.hud.detailsLabelText = @"Get closer to the ingredient to gather it.";
     
 	[self.hud show:YES];
-//    [self.hud hide:YES afterDelay:3];
     
     AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
 }
 
-- (void)ingredientBadgeDidStartGathering:(IngredientBadge *)badge
+- (void)deployedBeaconDidStartGathering:(DeployedBeacon *)deployedBeacon
 {
     DLog(@"Did start gathering");
     [self hideCurrentHUD];
 }
 
-- (void)ingredientBadge:(IngredientBadge *)badge
+- (void)deployedBeacon:(DeployedBeacon *)deployedBeacon
       didUpdateLogCount:(int)logCount
 {
     DLog(@"Did update log progress: %d", logCount);
     if (!self.hud)
     {
-        self.hud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
-        [self.navigationController.view addSubview:self.hud];
+        self.hud = [[MBProgressHUD alloc] initWithView:self.view];
+        [self.view addSubview:self.hud];
         
         // Set determinate mode
         self.hud.mode = MBProgressHUDModeDeterminate;
@@ -541,24 +625,25 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
         self.hud.progress = (logCount / (kNumSuccessiveLogs / kGameThreadDuration));
 }
 
-- (void)ingredientBadgeDidFindBadge:(IngredientBadge *)badge
+- (void)deployedBeaconDidFindBadge:(DeployedBeacon *)deployedBeacon
 {
     DLog(@"Did find ingredient");
+    [deployedBeacon setIsFound:YES];
     
     [self hideCurrentHUD];
     
-    self.hud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
-	[self.navigationController.view addSubview:self.hud];
+    self.hud = [[MBProgressHUD alloc] initWithView:self.view];
+	[self.view addSubview:self.hud];
     
     // Recommended icon size for progress hud.
     UIImageView *customView = [[UIImageView alloc]
                                initWithFrame:CGRectMake(0.0,
                                                         0.0,
                                                         100.0,
-                                                        100.0)
+                                                        140.0)
                                ];
     customView.contentMode = UIViewContentModeScaleAspectFit;
-    customView.image = [UIImage imageNamed:badge.imageURL];
+    customView.image = [UIImage imageNamed:[deployedBeacon.name lowercaseString]];
     
     self.hud.customView = customView;
     
@@ -566,21 +651,21 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
 	self.hud.mode = MBProgressHUDModeCustomView;
     
 	self.hud.delegate = self;
-	self.hud.labelText = [NSString stringWithFormat:@"Found %@", badge.name];
+	self.hud.labelText = [NSString stringWithFormat:@"Found %@", deployedBeacon.name];
     
 	[self.hud show:YES];
 	[self.hud hide:YES afterDelay:3];
     [self refreshBadges];
 }
 
-- (void)ingredientBadgeDidExitBadgeArea:(IngredientBadge *)badge
+- (void)deployedBeaconDidExitBadgeArea:(DeployedBeacon *)deployedBeacon
 {
     [self hideCurrentHUD];
     
-    if (!badge.isFound)
+    if (![deployedBeacon isFound])
     {
-        self.hud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
-        [self.navigationController.view addSubview:self.hud];
+        self.hud = [[MBProgressHUD alloc] initWithView:self.view];
+        [self.view addSubview:self.hud];
         
         self.hud.mode = MBProgressHUDModeText;
         
@@ -592,14 +677,14 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
     }
 }
 
-- (void)ingredientBadgeDidTimeout:(IngredientBadge *)badge
+- (void)deployedBeaconDidTimeout:(DeployedBeacon *)deployedBeacon
 {
     DLog(@"Did timeout badge find");
     
     [self hideCurrentHUD];
     
-    self.hud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
-	[self.navigationController.view addSubview:self.hud];
+    self.hud = [[MBProgressHUD alloc] initWithView:self.view];
+	[self.view addSubview:self.hud];
     
     // Recommended icon size for progress hud.
     UIImageView *customView = [[UIImageView alloc]
@@ -611,7 +696,12 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
     customView.contentMode = UIViewContentModeScaleAspectFit;
     customView.image = [UIImage imageNamed:kLockedBadgedImageName];
     
-    self.hud.customView = customView;
+    self.hud.customView = [[GatherProgressView alloc]
+                           initWithFrame:CGRectMake(0.0,
+                                                    0.0,
+                                                    100.0,
+                                                    140.0)
+                           ];
     
 	// Set custom view mode
 	self.hud.mode = MBProgressHUDModeCustomView;
@@ -644,42 +734,48 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
 
 - (void)startGameThread
 {
-    if (!self.gameThread)
-    {
-        self.gameThread = [NSTimer
-                           scheduledTimerWithTimeInterval:kGameThreadDuration
-                           target:self
-                           selector:@selector(updateGame:)
-                           userInfo:nil
-                           repeats:YES
-                           ];
-        DLog(@"Started Game Thread");
-    }
+    [self stopGameThread];
+    
+    self.gameThread = [NSTimer
+                       scheduledTimerWithTimeInterval:kGameThreadDuration
+                       target:self
+                       selector:@selector(updateGame:)
+                       userInfo:nil
+                       repeats:YES
+                       ];
+    DLog(@"Started Game Thread");
 }
 
 - (void)stopGameThread
 {
-    [self.gameThread invalidate];
-    self.gameThread = nil;
+    if (self.gameThread)
+        [self.gameThread invalidate];
     
     DLog(@"Stopped Game Thread");
 }
 
 - (void)updateGame:(NSTimer *)timer
 {
-    DLog(@"Update Game: %@", self.rangedBeacons);
+    CLBeacon *closestBeacon = [self.rangedBeacons firstObject];
+    NSString *key = [BeaconManager keyForUUID:closestBeacon.proximityUUID.UUIDString
+                                        major:closestBeacon.major.integerValue
+                                        minor:closestBeacon.minor.integerValue
+                     ];
     
-    NSArray *beacons = self.rangedBeacons;
+    DeployedBeacon *deployedBeacon = [BeaconManager deployedBeaconForKey:key];
     
-    CLBeacon *gameBeacon = [[beacons
-                             filteredArrayUsingPredicate:
-                             [self gameBeaconPredicate]
-                             ] firstObject];
-    
-    if (gameBeacon &&
-        (gameBeacon.proximity == CLProximityImmediate)
-        )
+    if ([deployedBeacon.type isEqualToString:kTypeBadge])
     {
+        [self.captureManager logRangedBeacons:@[closestBeacon]];
+        
+        if (!self.gameStatusImageView.hidden)
+            self.gameStatusImageView.hidden = YES;
+        
+    }
+    else if([deployedBeacon.type isEqualToString:kTypeGame] &&
+            closestBeacon.proximity == CLProximityImmediate)
+    {
+        // we have a game beacon
         NSString *imageName = \
         [self isGameOver] ? @"game_success" : @"game_error";
         
@@ -688,20 +784,38 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
         if (self.gameStatusImageView.hidden)
             self.gameStatusImageView.hidden = NO;
         
-        return;
+        [self.captureManager logRangedBeacons:nil];
     }
     
-    if (!self.gameStatusImageView.hidden)
-        self.gameStatusImageView.hidden = YES;
+    if (self.debug && deployedBeacon)
+        self.debugImageView.image = [UIImage
+                                     imageNamed:[deployedBeacon.name lowercaseString]];
+    else
+        self.debugImageView.image = nil;
     
-    NSPredicate *excludeGameBeacon = [NSPredicate
-                                      predicateWithFormat:@"major != %ld",
-                                      [self gameMajor]];
-    
-    NSArray *badgeBeacons = [beacons
-                             filteredArrayUsingPredicate:excludeGameBeacon];
-    
-    [self.captureManager logRangedBeacons: badgeBeacons];
+    // Give the user an indication of their proximity when the ingredient is
+    // spotted.
+    if (self.hud)
+    {
+        if ([self.hud.customView isKindOfClass:[GatherProgressView class]])
+        {
+            GatherProgressView *view = (GatherProgressView *)self.hud.customView;
+            
+            if ([closestBeacon accuracy] > [deployedBeacon accuracyWhenSpotted])
+                deployedBeacon.accuracyWhenSpotted = closestBeacon.accuracy;
+            
+            // Accuracy progress
+            CGFloat min = 0;
+            CGFloat max = [deployedBeacon accuracyWhenSpotted];
+            CGFloat currentValue =
+                                    [closestBeacon accuracy] != -1 ?
+                                    [closestBeacon accuracy] :
+                                    max;
+            
+            CGFloat progress = 1 - (currentValue - min) / (max - min);
+            [view setProgress:progress];
+        }
+    }
 }
 
 @end

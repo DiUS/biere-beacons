@@ -57,7 +57,7 @@
          <EnvironmentVariable
             key = "runningTests"
             value = "YES"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>
    </TestAction>

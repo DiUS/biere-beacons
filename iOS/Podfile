@@ -4,6 +4,7 @@
 target "BiereBeacons" do
 
 pod 'MBProgressHUD', '~> 0.8'
+pod 'Masonry'
 
 end
 

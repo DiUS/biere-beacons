@@ -12,14 +12,11 @@
 #import "IneligibleDeviceViewController.h"
 #import "UIColor+AppColors.h"
 #import "BadgeViewController.h"
-#import "IngredientBadge.h"
 
-@interface GameViewController () <UIPageViewControllerDataSource,
-UIPageViewControllerDelegate, UserActionDetailDelegate>
+@interface GameViewController () <UserActionDetailDelegate>
 
-@property (nonatomic) UIPageViewController *pageViewController;
-@property (nonatomic) NSArray *pages;
 @property (nonatomic) NSInteger index;
+@property (nonatomic) UIViewController *childController;
 
 @end
 
@@ -40,80 +37,47 @@ UIPageViewControllerDelegate, UserActionDetailDelegate>
      name:kLocationAuthorisationChange
      object:nil];
     
-    [self invalidatePageViewController];
+    [self invalidateChildController];
     
     if ([self respondsToSelector:@selector(edgesForExtendedLayout)])
         self.edgesForExtendedLayout = UIRectEdgeNone;
 }
 
-- (void)invalidatePageViewController
+- (void)invalidateChildController
 {
-    if ([self.childViewControllers containsObject:self.pageViewController])
+    if ([self.childViewControllers containsObject:self.childController])
     {
-        [self.pageViewController willMoveToParentViewController:nil];
-        [self.pageViewController.view removeFromSuperview];
-        [self.pageViewController removeFromParentViewController];
+        [self.childController willMoveToParentViewController:nil];
+        [self.childController.view removeFromSuperview];
+        [self.childController removeFromParentViewController];
     }
     
-    self.pageViewController = nil;
-    self.pages = nil;
+    // reset childController
+    self.childController = nil;
     
-    self.index = 0;
-    
-    [self addChildViewController:self.pageViewController];
-    self.pageViewController.view.frame = CGRectMake(0.0,
+    [self addChildViewController:self.childController];
+    self.childController.view.frame = CGRectMake(0.0,
                                                     0.0,
                                                     self.view.frame.size.width,
                                                     self.view.frame.size.height
                                                     );
-    [self.view addSubview:self.pageViewController.view];
-    [self.pageViewController didMoveToParentViewController:self];
+    [self.view addSubview:self.childController.view];
+    [self.childController didMoveToParentViewController:self];
     
-    self.title = [self.pages[self.index] title];
-    self.navigationItem.rightBarButtonItem = [[self.pages[self.index]
-                                               navigationItem]
+    self.title = self.childController.title;
+    self.navigationItem.rightBarButtonItem = [self.childController.navigationItem
                                               rightBarButtonItem];
-    self.navigationItem.leftBarButtonItem = [[self.pages[self.index]
-                                               navigationItem]
+    self.navigationItem.leftBarButtonItem = [self.childController.navigationItem
                                               leftBarButtonItem];
 }
 
-- (UIPageViewController *)pageViewController
+- (UIViewController *)childController
 {
-    if (!_pageViewController)
+    if (!_childController)
     {
-        _pageViewController = [
-           [UIPageViewController alloc]
-           initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
-           navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
-           options:nil
-                               ];
-        [_pageViewController setDelegate:self];
-        [_pageViewController setDataSource:self];
-        
-        [_pageViewController setViewControllers:@[self.pages[self.index]]
-                                      direction:UIPageViewControllerNavigationDirectionForward
-                                       animated:NO
-                                     completion:^(BOOL finished) {
-                                         DLog(@"Finished");
-                                     }];
-    }
-    
-    return _pageViewController;
-}
-
-- (NSArray *)pages
-{
-    if (!_pages)
-    {
-        NSMutableArray *pages = [NSMutableArray array];
-        
-        if (![BeaconManager isBeaconReady])
+        if(![BeaconManager isBeaconReady])
         {
-            _pages = @[
-                       [[IneligibleDeviceViewController alloc] init]
-                       ];
-            return _pages;
+            _childController = [[IneligibleDeviceViewController alloc] init];
         }
         
         if (![BeaconManager isLocationAware])
@@ -124,57 +88,22 @@ UIPageViewControllerDelegate, UserActionDetailDelegate>
                                                               description:@"The game needs to know how close you are to iBeacons. In order to gain this information we need you to grant the app Location Service privileges. The game is otherwise unplayable."
                                                               ];
             [locationAction setDelegate:self];
-            [pages addObject:locationAction];
+
+            _childController = locationAction;
         }
         else
         {
-            [pages addObject:[[BadgeViewController alloc ]
-                              initWithBadges:[IngredientBadge badges]]
-             ];
+            NSPredicate *badgePredicate = [NSPredicate
+                                           predicateWithFormat:@"type = 'badge'"];
+            NSArray *badges = [[BeaconManager deployedBeacons]
+                               filteredArrayUsingPredicate:badgePredicate];
+
+            _childController = [[BadgeViewController alloc ]
+                                initWithBadges:badges];
         }
-        
-        _pages = pages;
     }
     
-    return _pages;
-}
-
-#pragma mark - UIPageViewControllerDataSource
-
--(UIViewController *)pageViewController:(UIPageViewController *)pageViewController
-     viewControllerBeforeViewController:(UIViewController *)viewController
-{
-    self.index = [self.pages indexOfObject:viewController];
-    
-    DLog(@"before");
-    
-    if (self.index == 0)
-        return nil;
-    
-    return self.pages[self.index - 1];
-}
-
-- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
-       viewControllerAfterViewController:(UIViewController *)viewController
-{
-    self.index = [self.pages indexOfObject:viewController];
-    
-    DLog(@"after");
-    
-    if (self.index == self.pages.count-1)
-        return nil;
-    
-    
-    
-    return self.pages[self.index + 1];
-}
-
-#pragma mark - UIPageViewControllerDelegate
-
-- (void)pageViewController:(UIPageViewController *)pageViewController
-     willTransitionToViewControllers:(NSArray *)pendingViewControllers
-{
-    DLog(@"willTransitionToViewControllers: %@", pendingViewControllers);
+    return _childController;
 }
 
 #pragma mark - UserActionDetailDelegate
@@ -188,7 +117,7 @@ UIPageViewControllerDelegate, UserActionDetailDelegate>
 
 - (void)didLocationAuthorisationChange:(NSNotification *)notification
 {
-    [self invalidatePageViewController];
+    [self invalidateChildController];
 }
 
 @end

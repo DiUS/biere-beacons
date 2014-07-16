@@ -8,13 +8,13 @@
 
 #import "AppDelegate.h"
 #import "BadgeViewController.h"
-#import "IngredientBadge.h"
 #import "RegionDefaults.h"
 #import "IneligibleDeviceViewController.h"
 #import "UIColor+AppColors.h"
 #import "UserActionDetailViewController.h"
 #import "BeaconManager.h"
 #import "GameViewController.h"
+#import "BeaconManager.h"
 
 @interface AppDelegate() <CLLocationManagerDelegate>
 
@@ -30,21 +30,23 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
                                  forKey:kFirstRun];
     [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
     
+#if DEBUG
+    if (getenv("runningTests"))
+        return YES;
+#endif
+    
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     
-    NSArray *badges = [IngredientBadge badges];    
-    UIViewController *rootVC = [[BadgeViewController alloc]
-                                initWithBadges:badges];
+    UIViewController *rootVC = [[GameViewController alloc] init];
     
     if (![RegionDefaults isBeaconReady])
     {
         rootVC = [[IneligibleDeviceViewController alloc] init];
     }
-    
-    rootVC = [[GameViewController alloc] init];
     
     UINavigationController *navCtrl = [[UINavigationController alloc]
                                        initWithRootViewController:rootVC];
@@ -53,9 +55,15 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
                     NSForegroundColorAttributeName : [UIColor appPaleYellow]
                     }];
     
-    [navCtrl.navigationBar setBarTintColor: [UIColor appPaleBrown]];
-    [navCtrl.topViewController.view setBackgroundColor: [UIColor appPaleYellow]];
+//    [navCtrl.navigationBar setBarTintColor: [UIColor appPaleBrown]];
+//    [navCtrl.topViewController.view setBackgroundColor: [UIColor appPaleYellow]];
     self.window.rootViewController = navCtrl;
+    
+    // Styles
+    [[UINavigationBar appearance] setBarTintColor:[UIColor appPaleBrown]];
+    [[UISegmentedControl appearance] setTintColor:[UIColor appPaleBrown]];
+//    [[UIBarButtonItem appearance] setTintColor:[UIColor appPaleYellow]];
+    self.window.tintColor = [UIColor appPaleYellow];
     
     return YES;
 }
