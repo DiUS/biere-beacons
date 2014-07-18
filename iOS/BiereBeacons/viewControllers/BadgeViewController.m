@@ -388,7 +388,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex
     }
     else if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Edit settings"])
     {
-        [self stopGameThread];
+        self.isGameThreadPaused = YES;
         
         BadgeConfigViewController *vc = [[BadgeConfigViewController alloc]
                                          init];
@@ -418,7 +418,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex
     [self.navigationController dismissViewControllerAnimated:YES
                                                   completion:nil];
     
-    [self startGameThread];
+    self.isGameThreadPaused = NO;
 }
 
 #pragma mark - CBCentralManagerDelegate
