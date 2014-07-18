@@ -58,13 +58,13 @@ NSString *kLocationAuthorisationChange = @"LocationAuthorisationChange";
 
 + (void)requestAuthorisation
 {
+    BeaconManager *manager = [BeaconManager sharedInstance];
     if (![BeaconManager isLocationAware])
     {
         switch ([CLLocationManager authorizationStatus])
         {
             case kCLAuthorizationStatusNotDetermined:
             {
-                BeaconManager *manager = [BeaconManager sharedInstance];
                 [manager.locationManager startUpdatingLocation];
              
                 break;
@@ -82,6 +82,11 @@ NSString *kLocationAuthorisationChange = @"LocationAuthorisationChange";
         }
         
     }
+    else
+    {
+        [[BeaconManager sharedInstance] locationManager:manager.locationManager
+       didChangeAuthorizationStatus:[CLLocationManager authorizationStatus]];
+    }
 }
 
 + (BOOL)isLocationAware
@@ -94,17 +99,6 @@ NSString *kLocationAuthorisationChange = @"LocationAuthorisationChange";
     
     return NO;
 }
-
-//+ (BOOL)isBluetoothAware
-//{
-//    DLog(@"Bluetooth State: %ld", [[[BeaconManager sharedInstance] centralManager] state]);
-//    
-//    if ([[[BeaconManager sharedInstance] centralManager] state] ==
-//        CBCentralManagerStatePoweredOn)
-//        return YES;
-//    
-//    return NO;
-//}
 
 + (BOOL)isBeaconReady
 {
@@ -339,63 +333,6 @@ didChangeAuthorizationStatus:(CLAuthorizationStatus)status
      didUpdateLocations:(NSArray *)locations
 {
     [manager stopUpdatingLocation];
-}
-
-#pragma mark Region Monitoring
-
-- (void)locationManager:(CLLocationManager *)manager
-         didEnterRegion:(CLRegion *)region
-{
-    // TODO: Implement
-}
-
-- (void)locationManager:(CLLocationManager *)manager
-          didExitRegion:(CLRegion *)region
-{
-    // TODO: Implement
-}
-
-- (void)locationManager:(CLLocationManager *)manager
-       didFailWithError:(NSError *)error
-{
-    // TODO: Implement
-}
-
-- (void)locationManager:(CLLocationManager *)manager
-didStartMonitoringForRegion:(CLRegion *)region
-{
-    // TODO: Implement
-}
-
-- (void)locationManager:(CLLocationManager *)manager
-      didDetermineState:(CLRegionState)state
-              forRegion:(CLRegion *)region
-{
-    // TODO: Implement
-}
-
-#pragma mark Ranging
-
-- (void)locationManager:(CLLocationManager *)manager
-        didRangeBeacons:(NSArray *)beacons
-               inRegion:(CLBeaconRegion *)region
-{
-    // TODO: Implement
-}
-
-- (void)locationManager:(CLLocationManager *)manager
-rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
-              withError:(NSError *)error
-{
-    // TODO: Implement
-}
-
-#pragma mark - CBCentralManagerDelegate
-
-- (void)centralManagerDidUpdateState:(CBCentralManager *)central
-{
-    
-    // TODO: Implement
 }
 
 @end

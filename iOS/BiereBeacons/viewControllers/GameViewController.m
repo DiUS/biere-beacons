@@ -10,7 +10,6 @@
 #import "BeaconManager.h"
 #import "UserActionDetailViewController.h"
 #import "IneligibleDeviceViewController.h"
-#import "UIColor+AppColors.h"
 #import "BadgeViewController.h"
 
 @interface GameViewController () <UserActionDetailDelegate>
@@ -25,11 +24,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    UIPageControl *pageControl = [UIPageControl appearance];
-    pageControl.pageIndicatorTintColor = [UIColor lightGrayColor];
-    pageControl.currentPageIndicatorTintColor = [UIColor appPaleYellow];
-    pageControl.backgroundColor = [UIColor appPaleBrown];
     
     [[NSNotificationCenter defaultCenter]
      addObserver:self

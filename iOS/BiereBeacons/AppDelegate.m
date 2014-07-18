@@ -51,9 +51,13 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     UINavigationController *navCtrl = [[UINavigationController alloc]
                                        initWithRootViewController:rootVC];
     
-    [navCtrl.navigationBar setTitleTextAttributes:@{
-                    NSForegroundColorAttributeName : [UIColor appPaleYellow]
-                    }];
+//    [navCtrl.navigationBar setTitleTextAttributes:@{
+//                    NSForegroundColorAttributeName : [UIColor appPaleYellow]
+//                    }];
+    [[UINavigationBar appearance] setTitleTextAttributes:@{
+                       NSForegroundColorAttributeName : [UIColor appPaleYellow]
+                       }
+     ];
     
 //    [navCtrl.navigationBar setBarTintColor: [UIColor appPaleBrown]];
 //    [navCtrl.topViewController.view setBackgroundColor: [UIColor appPaleYellow]];
@@ -64,6 +68,11 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     [[UISegmentedControl appearance] setTintColor:[UIColor appPaleBrown]];
 //    [[UIBarButtonItem appearance] setTintColor:[UIColor appPaleYellow]];
     self.window.tintColor = [UIColor appPaleYellow];
+    
+    UIPageControl *pageControl = [UIPageControl appearance];
+    pageControl.pageIndicatorTintColor = [UIColor appPaleYellowAlpha:0.3];
+    pageControl.currentPageIndicatorTintColor = [UIColor appPaleYellow];
+    pageControl.backgroundColor = [UIColor appPaleBrown];
     
     return YES;
 }

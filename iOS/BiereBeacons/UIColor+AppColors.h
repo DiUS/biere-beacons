@@ -12,5 +12,7 @@
 
 + (UIColor *)appPaleYellow;
 + (UIColor *)appPaleBrown;
++ (UIColor *)appPaleBrownAlpha:(CGFloat)alpha;
++ (UIColor *)appPaleYellowAlpha:(CGFloat)alpha;
 
 @end

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>title</key>
+		<string>The Game</string>
+		<key>subtitle</key>
+		<string>Overcome Prohibition</string>
+		<key>imageInstructionName</key>
+		<string>prohibition</string>
+		<key>detailDescription</key>
+		<string>Access to the beer fridge is blocked since Rex Banner has enforced Prohibition.
+
+Your job is to walk around and find all the necessary ingredients for beer in order to start your own brew.</string>
+	</dict>
+	<dict>
+		<key>title</key>
+		<string>Spot</string>
+		<key>subtitle</key>
+		<string>Look around. You&apos;re near one.</string>
+		<key>imageInstructionName</key>
+		<string>spotted</string>
+		<key>detailDescription</key>
+		<string>You’ll be notified on your device when you’re in the general area (approx. 5m) of an ingredient.
+
+Keep looking, as you you’re still too far away from the ingredient to gather it.</string>
+	</dict>
+	<dict>
+		<key>title</key>
+		<string>Gather</string>
+		<key>subtitle</key>
+		<string>Sit tight! You&apos;ve nearly found it.</string>
+		<key>imageInstructionName</key>
+		<string>gather</string>
+		<key>detailDescription</key>
+		<string>You’ve managed to get within the range to gather the ingredient.
+
+When the progress circle completes, you will receive a badge for the ingredient that you found. </string>
+	</dict>
+	<dict>
+		<key>title</key>
+		<string>Validate</string>
+		<key>subtitle</key>
+		<string>Are you a beer baron?</string>
+		<key>imageInstructionName</key>
+		<string>validate</string>
+		<key>detailDescription</key>
+		<string>Once you receive a badge, you should return to the beer fridge to see if you’ve found them all.
+
+If ‘Prohibition is in effect’ then you need to keep looking.</string>
+	</dict>
+</array>
+</plist>

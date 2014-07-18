@@ -18,10 +18,11 @@
 #import "BeaconManager.h"
 #import "DeployedBeacon+Badge.h"
 #import "GatherProgressView.h"
+#import "InstructionsViewController.h"
 
 @interface BadgeViewController () <CLLocationManagerDelegate,
 DeployedBeaconDelegate, UIActionSheetDelegate, MBProgressHUDDelegate,
-CBCentralManagerDelegate>
+CBCentralManagerDelegate, InstructionsViewControllerDelegate>
 
 @property (nonatomic) NSArray *deployedBeacons;
 @property (nonatomic) NSArray *rangedBeacons;
@@ -34,6 +35,7 @@ CBCentralManagerDelegate>
 @property (nonatomic) NSTimer *gameThread;
 @property (nonatomic) BOOL debug;
 @property (nonatomic) UIImageView *debugImageView;
+@property (nonatomic) BOOL isGameThreadPaused;
 
 @end
 
@@ -114,6 +116,10 @@ static float kInset = 8.0f;
                     name:kBoundaryNotificationBody
                   object:nil];
 
+    [self validateBluetoothStatus];
+    
+    self.debug = NO;
+    
     // Show instuctions if first run
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSNumber *firstRun = (NSNumber *)[defaults
@@ -124,10 +130,6 @@ static float kInset = 8.0f;
         [defaults setObject:[NSNumber numberWithBool:NO] forKey:kFirstRun];
         [defaults synchronize];
     }
-    
-    [self validateBluetoothStatus];
-    
-    self.debug = NO;
     
 }
 
@@ -247,13 +249,21 @@ static float kInset = 8.0f;
 
 - (void)showGameInstructions
 {
-    NSString *message = @"Rex Banner has enforced Prohibition in the office. You must stop him. Overcome these draconian measures by walking around the Queen Street office and finding all the ingredients needed to start your own beer production. \n\nYou'll be notified when you're near an ingredient. Stay close and wait until the progress circle completes to successfully retrieve it. \n\nUpon finding an ingredient you'll receive a badge. Once you gather a new badge check the white fridge by standing in front of it to see if you have them all. You start with the 'barley' badge.";
+    InstructionsViewController *vc = [[InstructionsViewController alloc]
+                                      initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
+                                      navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
+                                      options:nil];
+    vc.instructionsDelegate = self;
     
-    [[[UIAlertView alloc] initWithTitle:@"Stop Rex Banner!"
-                                message:message
-                               delegate:nil
-                      cancelButtonTitle:@"Okay"
-                      otherButtonTitles:nil] show];
+    UINavigationController *nav = [[UINavigationController alloc]
+                                   initWithRootViewController:vc];
+
+    [self.navigationController presentViewController:nav
+                                            animated:YES
+                                          completion:nil];
+    
+    self.isGameThreadPaused = YES;
+    
 }
 
 - (void)editSettings
@@ -287,6 +297,15 @@ static float kInset = 8.0f;
          ];
         [self startGameThread];
     }
+}
+
+#pragma mark - InstructionsViewControllerDelegate
+
+- (void)instructionsDidClose:(InstructionsViewController *)controller
+{
+    [self.navigationController dismissViewControllerAnimated:YES completion:nil];
+    
+    self.isGameThreadPaused = NO;
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -756,6 +775,9 @@ rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region
 
 - (void)updateGame:(NSTimer *)timer
 {
+    if (self.isGameThreadPaused)
+        return;
+    
     CLBeacon *closestBeacon = [self.rangedBeacons firstObject];
     NSString *key = [BeaconManager keyForUUID:closestBeacon.proximityUUID.UUIDString
                                         major:closestBeacon.major.integerValue
