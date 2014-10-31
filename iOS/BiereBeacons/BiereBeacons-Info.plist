@@ -27,9 +27,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>We need Bluetooth on, so your device can receive the beacon's signal. </string>
+	<string>We need Bluetooth on, so your device can receive the beacon&apos;s signal. </string>
 	<key>NSLocationUsageDescription</key>
-	<string>We need your location to obtain your proximity to the beacons. You won't be able to play the game unless you grant access.</string>
+	<string>We need your location to obtain your proximity to the beacons. You won&apos;t be able to play the game unless you grant access.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We need your location to obtain your proximity to the beacons. You won&apos;t be able to play the game unless you grant access.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>bluetooth-central</string>
@@ -37,6 +39,7 @@
 	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
+		<string>location-services</string>
 		<string>armv7</string>
 		<string>bluetooth-le</string>
 	</array>

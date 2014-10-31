@@ -65,8 +65,14 @@ NSString *kLocationAuthorisationChange = @"LocationAuthorisationChange";
         {
             case kCLAuthorizationStatusNotDetermined:
             {
-                [manager.locationManager startUpdatingLocation];
-             
+                if ([manager.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)])
+                {
+                    [manager.locationManager requestAlwaysAuthorization];
+                    DLog(@"ios 8");
+                } else {
+                    [manager.locationManager startUpdatingLocation];
+                    DLog(@"ios 7");
+                }
                 break;
             }
             default:
@@ -138,7 +144,7 @@ NSString *kLocationAuthorisationChange = @"LocationAuthorisationChange";
     if (!_locationManager)
     {
         _locationManager = [[CLLocationManager alloc] init];
-        [_locationManager setDelegate:self];
+        [_locationManager setDelegate:[BeaconManager sharedInstance]];
     }
     
     return _locationManager;
@@ -327,6 +333,7 @@ didChangeAuthorizationStatus:(CLAuthorizationStatus)status
                         object:self];
     
     [[NSNotificationCenter defaultCenter] postNotification:n];
+    DLog(@"Authorisation did change: %i", status);
 }
 
 - (void)locationManager:(CLLocationManager *)manager

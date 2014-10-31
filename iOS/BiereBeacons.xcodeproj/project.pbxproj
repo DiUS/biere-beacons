@@ -60,6 +60,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		262A756B215AF58B62F48081 /* Pods-BiereBeacons.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BiereBeacons.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BiereBeacons/Pods-BiereBeacons.debug.xcconfig"; sourceTree = "<group>"; };
+		8AF55FB2A91A7A692FEB3A7D /* Pods-BiereBeaconsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BiereBeaconsTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-BiereBeaconsTests/Pods-BiereBeaconsTests.release.xcconfig"; sourceTree = "<group>"; };
+		AE3329CA9A9757BB75AEEFF6 /* Pods-BiereBeaconsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BiereBeaconsTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BiereBeaconsTests/Pods-BiereBeaconsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		B606CA40195BDD4C000A9B75 /* beacons.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = beacons.plist; sourceTree = "<group>"; };
 		B632E651195AB25F0079B17A /* IneligibleDeviceViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IneligibleDeviceViewController.h; path = BiereBeacons/viewControllers/IneligibleDeviceViewController.h; sourceTree = "<group>"; };
 		B632E652195AB25F0079B17A /* IneligibleDeviceViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IneligibleDeviceViewController.m; path = BiereBeacons/viewControllers/IneligibleDeviceViewController.m; sourceTree = "<group>"; };
@@ -117,8 +120,7 @@
 		B6C770E51960DFC200E83ADF /* UIColor+AppColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIColor+AppColors.m"; path = "BiereBeacons/UIColor+AppColors.m"; sourceTree = "<group>"; };
 		B6F5F5B9195945940076EB03 /* BadgeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BadgeCell.h; path = BiereBeacons/Views/BadgeCell.h; sourceTree = "<group>"; };
 		B6F5F5BA195945940076EB03 /* BadgeCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BadgeCell.m; path = BiereBeacons/Views/BadgeCell.m; sourceTree = "<group>"; };
-		B8ADF7C9ED20494296DAB7EE /* Pods-BiereBeaconsTests.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BiereBeaconsTests.xcconfig"; path = "Pods/Pods-BiereBeaconsTests.xcconfig"; sourceTree = "<group>"; };
-		BC4BA658967A404FA449126A /* Pods-BiereBeacons.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BiereBeacons.xcconfig"; path = "Pods/Pods-BiereBeacons.xcconfig"; sourceTree = "<group>"; };
+		BE1775A849F4DD35979F0C32 /* Pods-BiereBeacons.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BiereBeacons.release.xcconfig"; path = "Pods/Target Support Files/Pods-BiereBeacons/Pods-BiereBeacons.release.xcconfig"; sourceTree = "<group>"; };
 		F2A5FB779FDF4BB1A795F467 /* libPods-BiereBeacons.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BiereBeacons.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD090A8904724FEAAF98E618 /* libPods-BiereBeaconsTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BiereBeaconsTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -152,6 +154,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		105CE1D030D103E0CAA63275 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				262A756B215AF58B62F48081 /* Pods-BiereBeacons.debug.xcconfig */,
+				BE1775A849F4DD35979F0C32 /* Pods-BiereBeacons.release.xcconfig */,
+				AE3329CA9A9757BB75AEEFF6 /* Pods-BiereBeaconsTests.debug.xcconfig */,
+				8AF55FB2A91A7A692FEB3A7D /* Pods-BiereBeaconsTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		B654F5D2195D1BF6005AC697 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
@@ -169,8 +182,7 @@
 				B666D81F19592E1A0056CC58 /* BiereBeaconsTests */,
 				B666D7FF19592E190056CC58 /* Frameworks */,
 				B666D7FE19592E190056CC58 /* Products */,
-				BC4BA658967A404FA449126A /* Pods-BiereBeacons.xcconfig */,
-				B8ADF7C9ED20494296DAB7EE /* Pods-BiereBeaconsTests.xcconfig */,
+				105CE1D030D103E0CAA63275 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -465,7 +477,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Pods-BiereBeacons-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BiereBeacons/Pods-BiereBeacons-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		DB5F1E017A4847B2A69C1AA3 /* Copy Pods Resources */ = {
@@ -480,7 +492,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Pods-BiereBeaconsTests-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BiereBeaconsTests/Pods-BiereBeaconsTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -621,7 +633,7 @@
 		};
 		B666D82A19592E1A0056CC58 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BC4BA658967A404FA449126A /* Pods-BiereBeacons.xcconfig */;
+			baseConfigurationReference = 262A756B215AF58B62F48081 /* Pods-BiereBeacons.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -635,6 +647,7 @@
 					"-ObjC",
 					"-framework",
 					CoreGraphics,
+					"$(inherited)",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -644,7 +657,7 @@
 		};
 		B666D82B19592E1A0056CC58 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BC4BA658967A404FA449126A /* Pods-BiereBeacons.xcconfig */;
+			baseConfigurationReference = BE1775A849F4DD35979F0C32 /* Pods-BiereBeacons.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -658,6 +671,7 @@
 					"-ObjC",
 					"-framework",
 					CoreGraphics,
+					"$(inherited)",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -667,7 +681,7 @@
 		};
 		B666D82D19592E1A0056CC58 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B8ADF7C9ED20494296DAB7EE /* Pods-BiereBeaconsTests.xcconfig */;
+			baseConfigurationReference = AE3329CA9A9757BB75AEEFF6 /* Pods-BiereBeaconsTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/BiereBeacons.app/BiereBeacons";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -691,7 +705,7 @@
 		};
 		B666D82E19592E1A0056CC58 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B8ADF7C9ED20494296DAB7EE /* Pods-BiereBeaconsTests.xcconfig */;
+			baseConfigurationReference = 8AF55FB2A91A7A692FEB3A7D /* Pods-BiereBeaconsTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/BiereBeacons.app/BiereBeacons";
 				FRAMEWORK_SEARCH_PATHS = (
